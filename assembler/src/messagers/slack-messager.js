@@ -82,7 +82,7 @@ class SlackMessager extends MessagerBase {
     }
 
     async _sendToSlack(buildContext, firstLineEmoji, result, attachments) {
-        const suffix = buildContext.env === 'prod' ? '' : ` (${buildContext.env})`;
+        const suffix = buildContext.env === 'prd' ? '' : ` (${buildContext.env})`;
 
         let text = `${firstLineEmoji} ${buildContext.cdnHost} ${result} in ${this._getElapsedTime(buildContext.started)} seconds`;
 

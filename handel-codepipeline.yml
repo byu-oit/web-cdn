@@ -23,7 +23,7 @@ pipelines:
         cache: s3
       - type: slack_notify
         name: Notify
-        message: "Prod CDN Assembler Build Finished (cdn.byu.edu)"
+        message: "Prd CDN Assembler Build Finished (cdn.byu.edu)"
         channel: "#custom-code-bots"
   dev:
     phases:

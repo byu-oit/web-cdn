@@ -98,6 +98,8 @@ record pointing to the NS servers in the created hosted zone. Wait for that requ
 5. Update the appropriate pipeline in the [handel-codepipeline.yml](handel-codepipeline.yml) with the ARN of the ACM 
 certificate made (`CERTIFICATE_ARN`) and the `CloudformationDeploymentRole` role name (created by the CloudFormation 
 template) as the `build_role`.
+6. Update the certificate ARN and URL for the appropriate stage in the infrastructure section of 
+[main-config.yml](main-config.yml).
 
 ## TODOs
 

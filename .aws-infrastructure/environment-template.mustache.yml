@@ -14,7 +14,7 @@ Parameters:
     AllowedValues:
       - dev
       - stg
-      - prod
+      - prd
   RootDNS:
     Type: String
     Description: The root DNS zone, on which all other DNS zones should be based. Will create 'webhooks.' and 'metrics.' subdomains.
@@ -36,7 +36,7 @@ Parameters:
 
 Mappings:
   NormalCacheTTL:
-    prod:
+    prd:
       default: 7200 # 2 hours
       max: 86400 # 1 day
       min: 60
@@ -52,7 +52,7 @@ Mappings:
       max: 60
       min: 0
   AliasCacheTTL:
-    prod:
+    prd:
       default: 600
       max: 3600
       min: 0
@@ -68,7 +68,7 @@ Mappings:
       max: 300
       min: 0
   AliasRedirectCacheTime:
-    prod:
+    prd:
       user: 3600
       cache: 300
     stg:
@@ -206,7 +206,7 @@ Resources:
       DomainName: !Ref WebhookDomain
       # This is a shameless hack.  We're depending on some auto-generated names that could change at any time.
       RestApiId: !Ref ServerlessRestApi
-      Stage: !Ref ServerlessRestApiProdStage
+      Stage: !Ref ServerlessRestApiPrdStage
 
   WebhookFunc:
     Type: AWS::Serverless::Function
@@ -240,12 +240,12 @@ Resources:
         - Name: !Sub "webhooks.${RootDNS}"
           Type: A
           AliasTarget:
-            HostedZoneId: Z2FDTNDATAQYW2
+            HostedZoneId: Z2FDTNDATAQYW2 # See https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget.html
             DNSName: !GetAtt WebhookDomain.DistributionDomainName
         - Name: !Sub "webhooks.${RootDNS}"
           Type: AAAA
           AliasTarget:
-            HostedZoneId: Z2FDTNDATAQYW2
+            HostedZoneId: Z2FDTNDATAQYW2 # See https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget.html
             DNSName: !GetAtt WebhookDomain.DistributionDomainName
 
   WebsiteCloudfront:

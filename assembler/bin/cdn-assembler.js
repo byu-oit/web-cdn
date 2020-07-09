@@ -35,7 +35,7 @@ const args = require('yargs')
     })
     .describe('env', 'environment')
     .alias('env', 'e')
-    .choices('env', ['prod', 'stg', 'dev'])
+    .choices('env', ['prd', 'stg', 'dev'])
     .option('bucket', {
         alias: 'b',
         describe: 'target bucket',
