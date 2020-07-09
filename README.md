@@ -82,13 +82,13 @@ of the project's use cases.
 ## Deployment instructions
 
 The following instructions should be used to deploy the CDN into a new AWS account. These steps should be done manually 
-in the AWS console. Defaults should be used unless otherwise specified. Be sure to include the 
-[required tags](https://github.com/byu-oit/BYU-AWS-Documentation#tagging-standard) where possible for all resources 
-created.
+in the AWS console. Defaults should be used and resources created in us-west-2 unless otherwise specified. Be sure to 
+include the [required tags](https://github.com/byu-oit/BYU-AWS-Documentation#tagging-standard) where possible for all 
+resources created.
 
-1. Create a new CloudFormation stack using [account-and-iam.yml](.aws-infrastructure/account-and-iam.yml) as the 
-template. Give the stack a name of `web-community-cdn-account` and specify other parameters. The CDNName parameter 
-should be "web-community-cdn".
+1. Create a new CloudFormation stack in the us-east-1 region using 
+[account-and-iam.yml](.aws-infrastructure/account-and-iam.yml) as the template. Give the stack a name of 
+`web-community-cdn-account` and specify other parameters. The CDNName parameter should be "web-community-cdn".
 2. Create a new Route 53 Hosted Zone with a URL matching the URL in the 
 [handel-codepipeline.yml](handel-codepipeline.yml) file.
 3. Create a new ACM certificate in the us-east-1 region for the URL used in step two. On the "Validation" step, expand
