@@ -80,7 +80,7 @@
               "host": [
                 {
                   "key": "Host",
-                  "value": "web-community-cdn-stg-contents-us-east-1-818272543125.s3.amazonaws.com"
+                  "value": "web-community-cdn-stg-contents-us-west-2-818272543125.s3.amazonaws.com"
                 }
               ],
               "user-agent": [
@@ -107,7 +107,7 @@
               "s3": {
                 "authMethod": "none",
                 "customHeaders": {},
-                "domainName": "web-community-cdn-stg-contents-us-east-1-818272543125.s3.amazonaws.com",
+                "domainName": "web-community-cdn-stg-contents-us-west-2-818272543125.s3.amazonaws.com",
                 "path": ""
               }
             },

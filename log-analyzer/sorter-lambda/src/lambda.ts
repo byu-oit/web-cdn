@@ -72,7 +72,7 @@ PUT Object
       {
          "eventVersion":"2.0",
          "eventSource":"aws:s3",
-         "awsRegion":"us-east-1",
+         "awsRegion":"us-west-2",
          "eventTime":"1970-01-01T00:00:00.000Z",
          "eventName":"ObjectCreated:Put",
          "userIdentity":{
