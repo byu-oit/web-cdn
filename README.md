@@ -87,7 +87,8 @@ in the AWS console. Defaults should be used unless otherwise specified. Be sure 
 created.
 
 1. Create a new CloudFormation stack using [account-and-iam.yml](.aws-infrastructure/account-and-iam.yml) as the 
-template. Be sure to give the stack a name and specify the required parameters.
+template. Give the stack a name of `web-community-cdn-account` and specify other parameters. The CDNName parameter 
+should be "web-community-cdn".
 2. Create a new Route 53 Hosted Zone with a URL matching the URL in the 
 [handel-codepipeline.yml](handel-codepipeline.yml) file.
 3. Create a new ACM certificate in the us-east-1 region for the URL used in step two. On the "Validation" step, expand
@@ -97,3 +98,10 @@ record pointing to the NS servers in the created hosted zone. Wait for that requ
 5. Update the appropriate pipeline in the [handel-codepipeline.yml](handel-codepipeline.yml) with the ARN of the ACM 
 certificate made (`CERTIFICATE_ARN`) and the `CloudformationDeploymentRole` role name (created by the CloudFormation 
 template) as the `build_role`.
+
+## TODOs
+
+- Remove redundant files (todos.md, wishlist.md)
+- Switch to Terraform and GHA
+- Use updated node versiohn
+- Remove lerna version constraint

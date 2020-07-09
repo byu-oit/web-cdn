@@ -40,7 +40,7 @@ pipelines:
           ROOT_DNS: cdn-dev.byu.edu
           CONFIG_BRANCH: dev
           CERTIFICATE_ARN: arn:aws:acm:us-east-1:632558792265:certificate/667c6838-043a-40f2-827a-27fb76e64f94
-        build_role: web-cdn-dev-cfn-deploy
+        build_role: web-community-cdn-cfn-deploy
         cache: s3
       - type: slack_notify
         name: Notify
