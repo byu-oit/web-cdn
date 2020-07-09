@@ -206,7 +206,7 @@ Resources:
       DomainName: !Ref WebhookDomain
       # This is a shameless hack.  We're depending on some auto-generated names that could change at any time.
       RestApiId: !Ref ServerlessRestApi
-      Stage: !Ref ServerlessRestApiPrdStage
+      Stage: !Ref ServerlessRestApiProdStage
 
   WebhookFunc:
     Type: AWS::Serverless::Function
