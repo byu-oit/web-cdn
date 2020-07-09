@@ -16,7 +16,7 @@ apt-get update -q && apt-get install -yq nodejs yarn #jq
 
 echo "Installing lerna"
 
-yarn global add lerna
+yarn global add lerna@3.1.4
 
 yarn global add mustache
 

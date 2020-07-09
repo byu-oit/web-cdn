@@ -96,4 +96,4 @@ the domain name and click the "Create record in Route 53" box before clicking "C
 record pointing to the NS servers in the created hosted zone. Wait for that request to be completed before moving on.
 5. Update the appropriate pipeline in the [handel-codepipeline.yml](handel-codepipeline.yml) with the ARN of the ACM 
 certificate made (`CERTIFICATE_ARN`) and the `CloudformationDeploymentRole` role name (created by the CloudFormation 
-template) as teh `build_role`.
+template) as the `build_role`.
