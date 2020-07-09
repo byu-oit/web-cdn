@@ -1,0 +1,49 @@
+---
+version: 1
+
+name: web-community-cdn
+
+pipelines:
+  prd:
+    phases:
+      - type: github
+        name: GitHub
+        owner: byu-oit
+        repo: web-cdn
+        branch: master
+      - type: codebuild
+        name: Build
+        build_image: aws/codebuild/docker:17.09.0
+        environment_variables:
+          ENV: prd
+          ROOT_DNS: cdn.byu.edu
+          CONFIG_BRANCH: master
+          CERTIFICATE_ARN: arn:aws:acm:us-east-1:427927161742:certificate/2baac981-4646-464d-a879-a1576fbc30ef
+        build_role: web-community-cdn-cfn-deploy
+        cache: s3
+      - type: slack_notify
+        name: Notify
+        message: "Prod CDN Assembler Build Finished (cdn.byu.edu)"
+        channel: "#custom-code-bots"
+  dev:
+    phases:
+      - type: github
+        name: GitHub
+        owner: byu-oit
+        repo: web-cdn
+        branch: dev
+      - type: codebuild
+        name: Build
+        build_image: aws/codebuild/docker:17.09.0
+        environment_variables:
+          ENV: dev
+          ROOT_DNS: cdn-dev.byu.edu
+          CONFIG_BRANCH: dev
+          CERTIFICATE_ARN: arn:aws:acm:us-east-1:632558792265:certificate/667c6838-043a-40f2-827a-27fb76e64f94
+        build_role: web-community-cdn-cfn-deploy
+        cache: s3
+      - type: slack_notify
+        name: Notify
+        message: "Dev CDN Assembler Build Finished (cdn-dev.byu.edu)"
+        channel: "#custom-code-bots"
+

@@ -1,0 +1,440 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: "Account-wide resources and IAM permissions for the Serverless CDN"
+Parameters:
+  CDNName:
+    Type: String
+    Description: "A name for this particular CDN. Must be unique, though different 'Environment' values can share the same name."
+    AllowedPattern: "^[a-zA-Z0-9\\-_]*$"
+  RolePermissionsBoundaryARN:
+    Type: String
+    Description: "The ARN of the account's role permissions boundary."
+Mappings:
+  Prefixes:
+    infra-bucket:
+      cloudformation: packaged-cfn
+      logs: logs
+Resources:
+  AssemblerRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub "${CDNName}-assembler"
+      RepositoryPolicyText:
+        Version: "2008-10-17"
+        Statement:
+          - Sid: "AllowCodebuildPull"
+            Effect: "Allow"
+            Principal:
+              Service: "codebuild.amazonaws.com"
+            Action:
+              - "ecr:GetDownloadUrlForLayer"
+              - "ecr:BatchGetImage"
+              - "ecr:BatchCheckLayerAvailability"
+      LifecyclePolicy:
+        LifecyclePolicyText: |
+          {
+            "rules": [
+              {
+                "rulePriority": 10,
+                "description": "Clean up old images",
+                "selection": {
+                  "tagStatus": "untagged",
+                  "countType": "imageCountMoreThan",
+                  "countNumber": 20
+                },
+                "action": {
+                  "type": "expire"
+                }
+              }
+            ]
+          }
+
+  AccountBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: Private
+      BucketName: !Sub "${CDNName}-infra-and-logs-${AWS::Region}-${AWS::AccountId}"
+      LifecycleConfiguration:
+        Rules:
+        - Id: ExpireOldCfn
+          Prefix: !FindInMap [ Prefixes, infra-bucket, cloudformation ]
+          ExpirationInDays: 30
+          Status: Enabled
+        - Id: ExpireOldLogs
+          Prefix: !FindInMap [ Prefixes, infra-bucket, logs ]
+          ExpirationInDays: 365
+          Status: Enabled
+        - Id: OldLogsToInfrequentAccess
+          Prefix: !FindInMap [ Prefixes, infra-bucket, logs ]
+          Status: Enabled
+          Transitions:
+          - StorageClass: STANDARD_IA
+            TransitionInDays: 30
+      Tags:
+      - Key: Name
+        Value: !Sub "${CDNName} Infrastructure/Logging Bucket"
+
+  CdnBuilderRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - "codebuild.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: !Sub "/${CDNName}/"
+      PermissionsBoundary:
+        Ref: RolePermissionsBoundaryARN
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess"
+        - "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+      Policies:
+        - PolicyName: AllowCdnParameterStoreAcccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:DescribeParameters
+                  - ssm:GetParameters
+                Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${CDNName}.*"
+        - PolicyName: AllowCloudFrontInvalidation
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudfront:CreateInvalidation
+                  - cloudfront:GetInvalidation
+                  - cloudfront:ListInvalidations
+                Resource: "*"
+        - PolicyName: "AllowAssemblerImageAccess"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "ecr:GetAuthorizationToken"
+                  - "ecr:BatchCheckLayerAvailability"
+                  - "ecr:GetDownloadUrlForLayer"
+                  - "ecr:GetRepositoryPolicy"
+                  - "ecr:DescribeRepositories"
+                  - "ecr:ListImages"
+                  - "ecr:DescribeImages"
+                  - "ecr:BatchGetImage"
+                Resource: !GetAtt AssemblerRepository.Arn
+
+  CdnBuildInvokerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: !Sub "/${CDNName}/"
+      PermissionsBoundary:
+        Ref: RolePermissionsBoundaryARN
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      Policies:
+        - PolicyName: "AllowBuildInvocation"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action: "codebuild:StartBuild"
+                Resource: !Sub "arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:project/${CDNName}-*-assembler"
+  EdgeLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: !Sub "/${CDNName}/"
+      PermissionsBoundary:
+        Ref: RolePermissionsBoundaryARN
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+                - "edgelambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+
+  CloudformationCustomResourcesRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      Path: !Sub "/${CDNName}/"
+      PermissionsBoundary:
+        Ref: RolePermissionsBoundaryARN
+      RoleName: !Sub "${CDNName}-cfn-custom-res"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      Policies:
+        - PolicyName: "AllowLambdaVersioning"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'lambda:PublishVersion'
+                  - 'lambda:Get*'
+                  - 'lambda:List*'
+                  - 'lambda:UpdateAlias'
+                Resource:
+                  - !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${CDNName}-*"
+
+  CloudformationDeploymentRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      Path: !Sub "/${CDNName}/"
+      PermissionsBoundary:
+        Ref: RolePermissionsBoundaryARN
+      RoleName: !Sub "${CDNName}-cfn-deploy"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codebuild.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: AllowCreateServiceLinkedRoles
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'iam:CreateServiceLinkedRole'
+                Resource:
+                  - 'arn:aws:iam::*:role/aws-service-role/replicator.lambda.amazonaws.com/AWSServiceRoleForLambdaReplicator'
+                Condition:
+                  StringLike:
+                    "iam:AWSServiceName": replicator.lambda.amazonaws.com
+              - Effect: Allow
+                Action:
+                  - 'iam:PutRolePolicy'
+                Resource:
+                  - 'arn:aws:iam::*:role/aws-service-role/replicator.lambda.amazonaws.com/AWSServiceRoleForLambdaReplicator'
+        - PolicyName: AllowCloudWatchLogs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                Resource:
+                 - '*'
+        - PolicyName: AllowPipelineBucketAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 's3:GetObject'
+                  - 's3:GetObjectVersion'
+                  - 's3:PutObject'
+                Resource:
+                 - !Sub 'arn:aws:s3:::codepipeline-${AWS::Region}-${AWS::AccountId}/*'
+        - PolicyName: AllowInfraBucketAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 's3:GetBucketAcl'
+                  - 's3:PutBucketAcl'
+                Resource:
+                 - !GetAtt AccountBucket.Arn
+        - PolicyName: AllowAssemblerImageAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'ecr:*'
+                Resource:
+                  - !Sub "arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${CDNName}-*"
+              - Effect: Allow
+                Action:
+                  - 'ecr:GetAuthorizationToken'
+                Resource:
+                  - '*'
+        - PolicyName: AllowCodebuildAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'codebuild:*'
+                Resource:
+                  - !Sub "arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:project/${CDNName}-*"
+        - PolicyName: AllowS3Access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 's3:*'
+                Resource:
+                  - !Sub 'arn:aws:s3:::${CDNName}-*'
+        - PolicyName: AllowApiGatewayAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'apigateway:*'
+                Resource:
+                  - '*'
+        - PolicyName: AllowCloudFormationAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'cloudformation:*'
+                Resource:
+                  - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${CDNName}-*"
+                  - !Sub "arn:aws:cloudformation:${AWS::Region}:aws:transform/*"
+              - Effect: Allow
+                Action:
+                  - 'cloudformation:GetTemplateSummary'
+                  - 'cloudformation:ValidateTemplate'
+                Resource:
+                  - '*'
+        - PolicyName: AllowCloudFrontAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'cloudfront:*'
+                Resource:
+                  - '*'
+        - PolicyName: AllowLambdaAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'lambda:*'
+                Resource:
+                  - !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${CDNName}-*"
+              - Effect: Allow
+                Action:
+                  - 'lambda:TagResource'
+                  - 'lambda:UntagResource*' # The wildcard is necessary due to a bug in the Lambda API
+                  - 'lambda:ListTags'
+                Resource:
+                  - '*'
+        - PolicyName: AllowRoute53Access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'route53:*'
+                Resource:
+                  - '*'
+        - PolicyName: AllowPassRole
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'iam:GetRole'
+                  - 'iam:PassRole'
+                Resource:
+                  - !Sub "arn:aws:iam::*:role/${CDNName}/*"
+              # Deny the ability to pass ourself as a role to another service
+              - Effect: Deny
+                Action:
+                  - 'iam:PassRole'
+                Resource:
+                  - !Sub "arn:aws:iam::*:role/${CDNName}/${CDNName}-cfn-deploy"
+
+
+Outputs:
+  BuilderRole:
+    Description: ARN of the role for the CDN build process
+    Value: !GetAtt CdnBuilderRole.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-BuilderRole"
+  InvokerRole:
+    Description: ARN of the role for the CDN build invoker
+    Value: !GetAtt CdnBuildInvokerRole.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-InvokerRole"
+  CloudformationDeploymentRole:
+    Description: ARN of the role for the CDN pipeline
+    Value: !GetAtt CloudformationDeploymentRole.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-CloudformationDeploymentRole"
+  EdgeLambdaRole:
+    Description: ARN of the role for basic edge lambda invocations
+    Value: !GetAtt EdgeLambdaExecutionRole.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-EdgeLambdaExecutionRole"
+  CloudformationCustomResourcesRole:
+    Description: ARN of the role for cloudformation customization
+    Value: !GetAtt CloudformationCustomResourcesRole.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-CloudformationCustomResourcesRole"
+  AssemblerRepositoryArn:
+    Description: ECR assembler repository ARN
+    Value: !GetAtt AssemblerRepository.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-AssemblerRepositoryArn"
+  AssemblerRepositoryUri:
+    Description: ECR assembler repository URI
+    Value: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${AssemblerRepository}"
+    Export:
+      Name: !Sub "${AWS::StackName}-AssemblerRepositoryUri"
+  AccountBucketName:
+    Description: Account infra bucket name
+    Value: !Ref AccountBucket
+    Export:
+      Name: !Sub "${AWS::StackName}-InfraAndLogBucket"
+  AccountBucketDomainName:
+    Description: Account infra bucket name
+    Value: !GetAtt AccountBucket.DomainName
+    Export:
+      Name: !Sub "${AWS::StackName}-InfraAndLogBucketDomain"
+  AccountBucketLogsPrefix:
+    Description: Prefix for logs in account bucket
+    Value: !FindInMap [ Prefixes, infra-bucket, logs ]
+    Export:
+      Name: !Sub "${AWS::StackName}-InfraBucketLogsPrefix"
+  AccountBucketCfnPrefix:
+    Description: Prefix for cloudformation in account bucket
+    Value: !FindInMap [ Prefixes, infra-bucket, cloudformation ]
+    Export:
+      Name: !Sub "${AWS::StackName}-InfraBucketCloudformationPrefix"
+
+
+

@@ -1,0 +1,21 @@
+.github-api-key
+.handel-extensions/
+
+handel-secrets.txt
+
+node_modules/
+.tmp/
+
+# IDE files
+## Jetbrains
+.idea/
+*.iml
+## VS Code
+.vscode/
+
+keys/
+dist/
+
+.current-contents/
+
+lerna-*.log

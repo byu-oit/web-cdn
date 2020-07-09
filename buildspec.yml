@@ -1,0 +1,31 @@
+version: 0.2
+
+env:
+  variables:
+    CDN_NAME: web-community-cdn
+    ACCOUNT_STACK_NAME: web-community-cdn-account
+    CONFIG_REPO: byu-oit/web-cdn
+    EXTRA_TAGS: "data-sensitivity=public repo=https://github.com/byu-oit/web-cdn"
+
+phases:
+  install:
+    commands:
+      - find . -type f -name '*.sh' ! -path '**/node_modules/**' -exec chmod u+x {} \;
+      - .codebuild/setup.sh
+      - pip install awscli --upgrade --user
+      - mkdir -p /root/.cache/yarn && yarn config set cache-folder /root/.cache/yarn
+  pre_build:
+    commands:
+      - lerna bootstrap
+  build:
+    commands:
+      - lerna exec -- ./codebuild.sh
+      - echo $EXTRA_TAGS
+      - find ./* -mtime +10950 -exec touch {} \;
+      - .aws-infrastructure/deploy-environment.sh $CDN_NAME $ENV $ROOT_DNS $ACCOUNT_STACK_NAME $CERTIFICATE_ARN $CONFIG_REPO $CONFIG_BRANCH "$EXTRA_TAGS"
+
+
+cache:
+  paths:
+    - /var/cache/apt/**/*
+    - /root/.cache/**/*
