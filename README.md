@@ -3,6 +3,9 @@
 Welcome the source of the BYU Web Community CDN!  This CDN aims to host all of the resources you need to use the
 official BYU Look and Feel on your website.
 
+The CDN is now maintained by OIT. The source code for the previous version 1 of the CDN can be found in the 
+[BYU Web GitHub organization](https://github.com/byuweb/web-cdn).
+
 ## Adding Libraries to the CDN
 
 See [the checklist](docs/adding-libraries.md)
