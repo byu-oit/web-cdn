@@ -100,18 +100,21 @@ certificate made (`CERTIFICATE_ARN`) and the `CloudformationDeploymentRole` role
 template) as the `build_role`.
 6. Update the certificate ARN and URL for the appropriate stage in the infrastructure section of 
 [main-config.yml](main-config.yml).
-7. Reach out to an AWS admin to deploy the Handel CodePipeline. Wait for it to complete successfully before continuing.
-8. Copy the validation CNAME record from the original hosted zone create to the hosted zone (with the same name) 
+7. Create two parameters in SSM Parameter Store:
+  - `/web-community-cdn/{env}/slack-webhook`: The webhook CDN update alerts should be sent to
+  - `/web-community-cdn/{env}/slack-channel`: The channel CDN update alerts should be sent to
+8. Reach out to an AWS admin to deploy the Handel CodePipeline. Wait for it to complete successfully before continuing.
+9. Copy the validation CNAME record from the original hosted zone create to the hosted zone (with the same name) 
 created by CloudFormation. 
-9. Use [the same order form](https://it.byu.edu/it/?id=sc_cat_item&sys_id=2f7a54251d635d005c130b6c83f2390a) to request 
+10. Use [the same order form](https://it.byu.edu/it/?id=sc_cat_item&sys_id=2f7a54251d635d005c130b6c83f2390a) to request 
 the A record for the URL points to the NS servers in the CloudFormation-created hosted zone. Wait for that request to 
 be completed and for changes to propagate before moving on.
-10. Delete the manually created hosted zone.
+11. Delete the manually created hosted zone.
 
 ## TODOs
 
-- Remove redundant files (todos.md, wishlist.md)
+- Remove redundant files (todos.md, wishlist.md, etc.)
 - Switch to Terraform and GHA
-- Use latest node version
-- Remove lerna version constraint
-- Add test
+- Use latest recommended node version
+- Add tests
+- Solidify name (web-cdn, web-community-cdn, etc.)
