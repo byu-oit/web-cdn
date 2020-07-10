@@ -100,9 +100,9 @@ certificate made (`CERTIFICATE_ARN`) and the `CloudformationDeploymentRole` role
 template) as the `build_role`.
 6. Update the certificate ARN and URL for the appropriate stage in the infrastructure section of 
 [main-config.yml](main-config.yml).
-7. Create two parameters in SSM Parameter Store:
-  - `/web-community-cdn/{env}/slack-webhook`: The webhook CDN update alerts should be sent to
-  - `/web-community-cdn/{env}/slack-channel`: The channel CDN update alerts should be sent to
+7. Create the following parameters in SSM Parameter Store:
+  - `web-community-cdn.{env}.slack-webhook`: The webhook CDN update alerts should be sent to
+  - `web-community-cdn.{env}.slack-channel`: The channel CDN update alerts should be sent to
 8. Reach out to an AWS admin to deploy the Handel CodePipeline. Wait for it to complete successfully before continuing.
 9. Copy the validation CNAME record from the original hosted zone create to the hosted zone (with the same name) 
 created by CloudFormation. 
@@ -116,5 +116,7 @@ be completed and for changes to propagate before moving on.
 - Remove redundant files (todos.md, wishlist.md, etc.)
 - Switch to Terraform and GHA
 - Use latest recommended node version
+- Cache docker images
+- Use a GitHub bot we can control
 - Add tests
 - Solidify name (web-cdn, web-community-cdn, etc.)
