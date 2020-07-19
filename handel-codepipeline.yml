@@ -18,12 +18,12 @@ pipelines:
           ENV: prd
           ROOT_DNS: cdn.byu.edu
           CONFIG_BRANCH: master
-          CERTIFICATE_ARN: arn:aws:acm:us-east-1:427927161742:certificate/2baac981-4646-464d-a879-a1576fbc30ef
+          CERTIFICATE_ARN: arn:aws:acm:us-east-1:204581410681:certificate/18c1b547-de51-43d3-afa5-2bd05493c41c
         build_role: web-community-cdn-cfn-deploy
         cache: s3
       - type: slack_notify
         name: Notify
-        message: "Prod CDN Assembler Build Finished (cdn.byu.edu)"
+        message: "Prd CDN Assembler Build Finished (cdn.byu.edu)"
         channel: "#custom-code-bots"
   dev:
     phases:
@@ -39,7 +39,7 @@ pipelines:
           ENV: dev
           ROOT_DNS: cdn-dev.byu.edu
           CONFIG_BRANCH: dev
-          CERTIFICATE_ARN: arn:aws:acm:us-east-1:632558792265:certificate/667c6838-043a-40f2-827a-27fb76e64f94
+          CERTIFICATE_ARN: arn:aws:acm:us-east-1:632558792265:certificate/1bc2f81c-2f79-46b3-9d3b-54ce672ba8be
         build_role: web-community-cdn-cfn-deploy
         cache: s3
       - type: slack_notify

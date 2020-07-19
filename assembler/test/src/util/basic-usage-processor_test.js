@@ -1,6 +1,6 @@
 /*
  *  @license
- *    Copyright 2018 Brigham Young University
+ *    Copyright 2020 Brigham Young University
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -72,14 +72,14 @@ describe('basic-usage-processor', () => {
                 <link rel="preload" href="https://fake.cdn.byu.edu/lib/version/byu-theme-components.min.css" as="style" type="text/css">
                 <link rel="preload" href="https://fake.cdn.byu.edu/lib/version/byu-theme-components.min.js" as="script" type="application/javascript">
                 <link rel="preload" href="https://fake.cdn.byu.edu/lib/version/some-font.ttf" as="font" type="font/ttf" crossorigin="anonymous">
-                
+
                 <!-- Meta -->
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                
+
                 <!-- Stylesheets -->
                 <link rel="stylesheet" href="https://cloud.typography.com/75214/6517752/css/fonts.css" type="text/css">
                 <link rel="stylesheet" href="https://fake.cdn.byu.edu/lib/version/byu-theme-components.min.css" type="text/css">
-                
+
                 <!-- Scripts -->
                 <script src="https://fake.cdn.byu.edu/lib/version/byu-theme-components.min.js" async type="application/javascript"></script>
                 <script src="https://fake.cdn.byu.edu/lib/version/module.js" type="module"></script>

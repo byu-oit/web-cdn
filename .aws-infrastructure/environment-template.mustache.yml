@@ -14,7 +14,7 @@ Parameters:
     AllowedValues:
       - dev
       - stg
-      - prod
+      - prd
   RootDNS:
     Type: String
     Description: The root DNS zone, on which all other DNS zones should be based. Will create 'webhooks.' and 'metrics.' subdomains.
@@ -36,7 +36,7 @@ Parameters:
 
 Mappings:
   NormalCacheTTL:
-    prod:
+    prd:
       default: 7200 # 2 hours
       max: 86400 # 1 day
       min: 60
@@ -52,7 +52,7 @@ Mappings:
       max: 60
       min: 0
   AliasCacheTTL:
-    prod:
+    prd:
       default: 600
       max: 3600
       min: 0
@@ -68,7 +68,7 @@ Mappings:
       max: 300
       min: 0
   AliasRedirectCacheTime:
-    prod:
+    prd:
       user: 3600
       cache: 300
     stg:
@@ -214,7 +214,7 @@ Resources:
       FunctionName: !Sub "${CDNName}-webhooks-${Environment}"
       CodeUri: ./../webhooks/
       Handler: lambda.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       MemorySize: 128
       Timeout: 60
       Role:
@@ -240,12 +240,12 @@ Resources:
         - Name: !Sub "webhooks.${RootDNS}"
           Type: A
           AliasTarget:
-            HostedZoneId: Z2FDTNDATAQYW2
+            HostedZoneId: Z2FDTNDATAQYW2 # See https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget.html
             DNSName: !GetAtt WebhookDomain.DistributionDomainName
         - Name: !Sub "webhooks.${RootDNS}"
           Type: AAAA
           AliasTarget:
-            HostedZoneId: Z2FDTNDATAQYW2
+            HostedZoneId: Z2FDTNDATAQYW2 # See https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget.html
             DNSName: !GetAtt WebhookDomain.DistributionDomainName
 
   WebsiteCloudfront:
@@ -319,12 +319,12 @@ Resources:
         - Name: !Ref RootDNS
           Type: A
           AliasTarget:
-            HostedZoneId: Z2FDTNDATAQYW2
+            HostedZoneId: Z2FDTNDATAQYW2 # See https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget.html
             DNSName: !GetAtt WebsiteCloudfront.DomainName
         - Name: !Ref RootDNS
           Type: AAAA
           AliasTarget:
-            HostedZoneId: Z2FDTNDATAQYW2
+            HostedZoneId: Z2FDTNDATAQYW2 # See https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-route53-aliastarget.html
             DNSName: !GetAtt WebsiteCloudfront.DomainName
 
   EagerRedirectFunc:
@@ -333,7 +333,7 @@ Resources:
       FunctionName: !Sub "${CDNName}-edge-eager-redirect-${Environment}"
       CodeUri: ./../edge-lambdas/eager-redirect/
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       MemorySize: 512
       Timeout: 20
       Role:
@@ -350,7 +350,7 @@ Resources:
       FunctionName: !Sub "${CDNName}-edge-enhanced-headers-${Environment}"
       CodeUri: ./../edge-lambdas/enhanced-headers/
       Handler: index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       MemorySize: 128
       Timeout: 20
       Role:
@@ -413,7 +413,7 @@ Resources:
       FunctionName: !Sub "${CDNName}-${Environment}-LogAnalyzer-Sorter"
       CodeUri: ./../log-analyzer/sorter-lambda/
       Handler: lib/lambda.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       MemorySize: 128
       Timeout: 20
       Environment:

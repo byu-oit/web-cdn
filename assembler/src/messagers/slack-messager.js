@@ -1,6 +1,6 @@
 /*
  *  @license
- *    Copyright 2018 Brigham Young University
+ *    Copyright 2020 Brigham Young University
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ class SlackMessager extends MessagerBase {
     }
 
     async _sendToSlack(buildContext, firstLineEmoji, result, attachments) {
-        const suffix = buildContext.env === 'prod' ? '' : ` (${buildContext.env})`;
+        const suffix = buildContext.env === 'prd' ? '' : ` (${buildContext.env})`;
 
         let text = `${firstLineEmoji} ${buildContext.cdnHost} ${result} in ${this._getElapsedTime(buildContext.started)} seconds`;
 
