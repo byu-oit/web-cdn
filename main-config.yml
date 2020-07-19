@@ -172,5 +172,5 @@ infrastructure:
       settings:
         root-dns: cdn.byu.edu
         account-stack-name: web-community-cdn-account
-        certificate-arn: arn:something
+        certificate-arn: arn:aws:acm:us-east-1:204581410681:certificate/18c1b547-de51-43d3-afa5-2bd05493c41c
 

@@ -103,6 +103,8 @@ template) as the `build_role`.
 7. Create the following parameters in SSM Parameter Store:
   - `web-community-cdn.{env}.slack-webhook`: The webhook CDN update alerts should be sent to
   - `web-community-cdn.{env}.slack-channel`: The channel CDN update alerts should be sent to
+  - `web-community-cdn.{env}.github-user`: The GitHub user to connect to GitHub with.
+  - `web-community-cdn.{env}.github-token`: The token of the user to connect to GitHub with.
 8. Reach out to an AWS admin to deploy the Handel CodePipeline. Wait for it to complete successfully before continuing.
 9. Copy the validation CNAME record from the original hosted zone create to the hosted zone (with the same name) 
 created by CloudFormation. 
