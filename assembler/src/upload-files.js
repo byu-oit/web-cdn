@@ -176,8 +176,7 @@ async function copyFilesToDestination(bucket, files) {
 async function invalidateInfraFiles(files, cdnHost, dryRun) {
     const paths = files.filter(it => it.invalidate)
         .map(it => it.cdnPath);
-
-    paths.push('/manifest.json');
+    
     if (dryRun) {
         log.debug('Dry run; would have invalidated', paths);
         return;

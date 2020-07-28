@@ -44,6 +44,7 @@ const CACHE_CONTROL_ONE_MINUTE = 'public, max-age=60, s-maxage=0';
 
 const CACHE_CONTROL_FIVE_MINUTES_REVALIDATE = 'public, must-revalidate, proxy-revalidate, max-age=300, s-maxage=60';
 
+const MANIFEST_FILE = '/manifest.json';
 const REDIRECTS_PATH = '/.cdn-infra/redirects.json';
 
 module.exports = async function buildLayout(buildContext, oldManifest, newManifest, actions, sourceDirs) {
@@ -94,8 +95,8 @@ module.exports = async function buildLayout(buildContext, oldManifest, newManife
 
 function buildManifestFile(manifest) {
     return {
-        name: 'manifest.json',
-        cdnPath: 'manifest.json',
+        name: MANIFEST_FILE,
+        cdnPath: MANIFEST_FILE,
         type: 'application/json',
         contents: JSON.stringify(manifest),
         invalidate: true,
