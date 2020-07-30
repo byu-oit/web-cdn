@@ -1,7 +1,7 @@
 {
   "name": "web-cdn",
   "description": "CDN for serving BYU assets.",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "maintainers": [
     "Blake Morgan <blake_morgan@byu.edu>"
   ],
