@@ -13,7 +13,7 @@ pipelines:
         branch: master
       - type: codebuild
         name: Build
-        build_image: aws/codebuild/docker:17.09.0
+        build_image: aws/codebuild/standard:3.0
         environment_variables:
           ENV: prd
           ROOT_DNS: cdn.byu.edu
@@ -34,7 +34,7 @@ pipelines:
         branch: dev
       - type: codebuild
         name: Build
-        build_image: aws/codebuild/docker:17.09.0
+        build_image: aws/codebuild/standard:3.0
         environment_variables:
           ENV: dev
           ROOT_DNS: cdn-dev.byu.edu
