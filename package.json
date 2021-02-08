@@ -5,7 +5,7 @@
   "maintainers": [
     "Blake Morgan <blake_morgan@byu.edu>"
   ],
-	"private": true,
+  "private": true,
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -16,9 +16,9 @@
   },
   "homepage": "https://github.com/byu-oit/web-cdn",
   "scripts": {
-		"install": "find ./node_modules/* -mtime +10950 -exec touch {} \\;"
-	},
-	"devDependencies": {
-		"lerna": "^2.4.0"
-	}
+    "install": "find ./node_modules/* -mtime +10950 -exec touch {} \\;"
+  },
+  "devDependencies": {
+    "lerna": "^2.4.0"
+  }
 }

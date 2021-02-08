@@ -214,7 +214,7 @@ Resources:
       FunctionName: !Sub "${CDNName}-webhooks-${Environment}"
       CodeUri: ./../webhooks/
       Handler: lambda.handler
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       MemorySize: 128
       Timeout: 60
       Role:
@@ -333,7 +333,7 @@ Resources:
       FunctionName: !Sub "${CDNName}-edge-eager-redirect-${Environment}"
       CodeUri: ./../edge-lambdas/eager-redirect/
       Handler: index.handler
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       MemorySize: 512
       Timeout: 20
       Role:
@@ -350,7 +350,7 @@ Resources:
       FunctionName: !Sub "${CDNName}-edge-enhanced-headers-${Environment}"
       CodeUri: ./../edge-lambdas/enhanced-headers/
       Handler: index.handler
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       MemorySize: 128
       Timeout: 20
       Role:
@@ -413,7 +413,7 @@ Resources:
       FunctionName: !Sub "${CDNName}-${Environment}-LogAnalyzer-Sorter"
       CodeUri: ./../log-analyzer/sorter-lambda/
       Handler: lib/lambda.handler
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       MemorySize: 128
       Timeout: 20
       Environment:
