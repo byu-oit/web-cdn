@@ -12,7 +12,7 @@
     "install": "find ./node_modules/* -mtime +10950 -exec touch {} \\;"
   },
   "dependencies": {
-    "aws-sdk": "^2.9.0",
+    "aws-sdk": "^2.814.0",
     "aws-serverless-express": "^3.0.2",
     "body-parser": "^1.17.2",
     "express": "^4.15.4",
