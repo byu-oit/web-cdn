@@ -85,7 +85,7 @@ jobs:
           aws-secret-access-key: ${{ secrets[matrix.env.aws_secret_name] }}
           aws-region: us-west-2
 
-      - name: Make files executable #Todo do we need this in GHA?
+      - name: Make files executable #Todo test if need this in GHA?
         run: find . -type f -name '*.sh' ! -path '**/node_modules/**' -exec chmod u+x {} \;
 
       - name: Setup
@@ -95,7 +95,7 @@ jobs:
         run: pip install awscli --upgrade --user
 
       - name: Setup
-        run: mkdir -p /root/.cache/yarn && yarn config set cache-folder /root/.cache/yarn
+        run: mkdir -p /temp/.cache/yarn && yarn config set cache-folder /temp/.cache/yarn #TODO fix
 
       - name: Lerna Boostrap
         run: lerna bootstrap
