@@ -94,8 +94,8 @@ jobs:
       - name: Install AWSCLI #todo better way to do this?
         run: pip install awscli --upgrade --user
 
-      - name: Setup
-        run: mkdir -p /temp/.cache/yarn && yarn config set cache-folder /temp/.cache/yarn #TODO fix
+#      - name: Setup
+#        run: mkdir -p /temp/.cache/yarn && yarn config set cache-folder /temp/.cache/yarn #TODO fix
 
       - name: Lerna Boostrap
         run: lerna bootstrap
