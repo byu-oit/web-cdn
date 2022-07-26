@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up DEV Environment Variables
-        if: github.ref == 'refs/heads/gha' # change to dev after testing
+        if: github.ref == 'refs/heads/gha' # TODO after testing (1)change to dev, (2)update env vars
         run: |
           matrix='{
             "env":[
@@ -29,7 +29,11 @@ jobs:
                 "CDN_NAME": "web-community-cdn",
                 "ACCOUNT_STACK_NAME": "web-community-cdn-account",
                 "CONFIG_REPO": "byu-oit/web-cdn",
-                "EXTRA_TAGS": "data-sensitivity=public repo=https://github.com/byu-oit/web-cdn"
+                "EXTRA_TAGS": "data-sensitivity=public repo=https://github.com/byu-oit/web-cdn",
+                "ENV" : "gha",
+                "ROOT_DNS" : "cdn-gha.byu.edu",
+                "CONFIG_BRANCH": "gha",
+                "CERTIFICATE_ARN" : "arn:aws:acm:us-east-1:632558792265:certificate/d593e652-ac4c-40e1-9d0c-14b0544042f1"
               }
             ]
           }'
@@ -91,7 +95,7 @@ jobs:
       - name: Setup
         run: .codebuild/setup.sh
 
-      - name: Install AWSCLI #todo better way to do this?
+      - name: Install AWSCLI
         run: pip install awscli --upgrade --user
 
 #      - name: Setup
@@ -103,14 +107,11 @@ jobs:
       - name: Lerna Exec
         run: lerna exec -- ./codebuild.sh
 
-      - name: log
-        run: echo $EXTRA_TAGS #todo what's this?
-
       - name: find
         run: find ./* -mtime +10950 -exec touch {} \;
 
       - name: deploy
-        run: .aws-infrastructure/deploy-environment.sh $CDN_NAME $ENV $ROOT_DNS $ACCOUNT_STACK_NAME $CERTIFICATE_ARN $CONFIG_REPO $CONFIG_BRANCH "$EXTRA_TAGS"
+        run: .aws-infrastructure/deploy-environment.sh ${{matrix.CDN_NAME}} ${{matrix.ENV}} ${{matrix.ROOT_DNS}} ${{matrix.ACCOUNT_STACK_NAME}} ${{matrix.CERTIFICATE_ARN}} ${{matrix.CONFIG_REPO}} ${{matrix.CONFIG_BRANCH}} "${{matrix.EXTRA_TAGS}}"
 
 
 #      - name: Start Standard Change
