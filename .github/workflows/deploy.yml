@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up DEV Environment Variables
-        if: github.ref == 'refs/heads/dev' | github.ref == 'refs/heads/gha' # remove gha after testing
+        if: github.ref == 'refs/heads/gha' # change to dev after testing
         run: |
           matrix='{
             "env":[
