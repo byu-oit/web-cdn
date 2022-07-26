@@ -1,0 +1,133 @@
+name: Deploy
+
+on:
+  push:
+    branches: [gha, dev, master] #gha for pre-dev testing
+    paths-ignore:
+      - LICENSE
+      - README.md
+concurrency: ${{ github.ref }}
+env:
+  tf_version: "1.1.7" # must match value in terraform-iac/*/app/main.tf
+
+jobs:
+  env:
+    name: Set Env Vars
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up DEV Environment Variables
+        if: github.ref == 'refs/heads/dev' | github.ref == 'refs/heads/gha' # remove gha after testing
+        run: |
+          matrix='{
+            "env":[
+              {
+                "aws_key_name":"byu_oit_webcommunity_dev_key",
+                "aws_secret_name":"byu_oit_webcommunity_dev_secret",
+                "rfc_key_name":"standard_change_sandbox_client_key",
+                "rfc_secret_name":"standard_change_sandbox_client_secret",
+                "rfc_template_id":"Codepipeline-Standard-Change"',
+                "CDN_NAME": "web-community-cdn",
+                "ACCOUNT_STACK_NAME": "web-community-cdn-account",
+                "CONFIG_REPO": "byu-oit/web-cdn",
+                "EXTRA_TAGS": "data-sensitivity=public repo=https://github.com/byu-oit/web-cdn"'
+              }
+            ]
+          }'
+          echo matrix=`echo $matrix | jq -c .` >> $GITHUB_ENV
+
+      - name: Set up PRD Environment Variables
+        if: github.ref == 'refs/heads/main'
+        # TODO: When prd really is production, in prd environment (first block below):
+        # * Change standard_change_sandbox_client_key to standard_change_production_client_key
+        # * Change standard_change_sandbox_client_secret to standard_change_production_client_secret
+        # You probably don't want to do this in cpy (second block), or you will get two RFCs everytime you push to master
+        run: |
+          matrix='{
+            "env":[
+              {
+                "aws_key_name":"byu_oit_webcommunity_prd_key",
+                "aws_secret_name":"byu_oit_webcommunity_dev_secret",
+                "rfc_key_name":"standard_change_sandbox_client_key",
+                "rfc_secret_name":"standard_change_sandbox_client_secret",
+                "rfc_template_id":"Codepipeline-Standard-Change",
+                "slack_channel":"#slack-bot-testing",
+                "CDN_NAME": "web-community-cdn",
+                "ACCOUNT_STACK_NAME": "web-community-cdn-account",
+                "CONFIG_REPO": "byu-oit/web-cdn",
+                "EXTRA_TAGS": "data-sensitivity=public repo=https://github.com/byu-oit/web-cdn"
+              }
+            ]
+          }'
+          echo matrix=`echo $matrix | jq -c .` >> $GITHUB_ENV
+
+    outputs:
+      matrix: ${{ env.matrix }}
+
+  build_and_deploy:
+    name: Build CDN pipeline
+    runs-on: ubuntu-latest
+    needs: env
+    strategy:
+      matrix: ${{ fromJson(needs.env.outputs.matrix) }}
+    steps:
+      - name: Check out
+        uses: actions/checkout@v2
+
+      - name: Disallow Concurrent Runs
+        uses: byu-oit/github-action-disallow-concurrent-runs@v2
+        with:
+          token: ${{ github.token }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets[matrix.env.aws_key_name] }}
+          aws-secret-access-key: ${{ secrets[matrix.env.aws_secret_name] }}
+          aws-region: us-west-2
+
+      - name: Make files executable #Todo do we need this in GHA?
+        run: find . -type f -name '*.sh' ! -path '**/node_modules/**' -exec chmod u+x {} \;
+
+      - name: Setup
+        run: .codebuild/setup.sh
+
+      - name: Install AWSCLI #todo better way to do this?
+        run: pip install awscli --upgrade --user
+
+      - name: Setup
+        run: mkdir -p /root/.cache/yarn && yarn config set cache-folder /root/.cache/yarn
+
+      - name: Lerna Boostrap
+        run: lerna bootstrap
+
+      - name: Lerna Exec
+        run: lerna exec -- ./codebuild.sh
+
+      - name: log
+        run: echo $EXTRA_TAGS #todo what's this?
+
+      - name: find
+        run: find ./* -mtime +10950 -exec touch {} \;
+
+      - name: deploy
+        run: .aws-infrastructure/deploy-environment.sh $CDN_NAME $ENV $ROOT_DNS $ACCOUNT_STACK_NAME $CERTIFICATE_ARN $CONFIG_REPO $CONFIG_BRANCH "$EXTRA_TAGS"
+
+
+#      - name: Start Standard Change
+#        uses: byu-oit/github-action-start-standard-change@v1
+#        id: start-standard-change
+#        with:
+#          client-key: ${{ secrets[matrix.env.rfc_key_name] }}
+#          client-secret: ${{ secrets[matrix.env.rfc_secret_name] }}
+#          template-id: ${{ matrix.env.rfc_template_id }}
+
+
+#      - name: End Standard Change
+#        uses: byu-oit/github-action-end-standard-change@v1
+#        if: always() && steps.start-standard-change.outcome == 'success' # Run if RFC started, even if the deploy failed
+#        with:
+#          client-key: ${{ secrets[matrix.env.rfc_key_name] }}
+#          client-secret: ${{ secrets[matrix.env.rfc_secret_name] }}
+#          change-sys-id: ${{ steps.start-standard-change.outputs.change-sys-id }}
+#          work-start: ${{ steps.start-standard-change.outputs.work-start }}
+#          success: ${{ steps.deploy.outcome == 'success' }}
