@@ -26,14 +26,14 @@ jobs:
                 "rfc_key_name":"standard_change_sandbox_client_key",
                 "rfc_secret_name":"standard_change_sandbox_client_secret",
                 "rfc_template_id":"Codepipeline-Standard-Change",
-                "CDN_NAME": "web-community-cdn",
-                "ACCOUNT_STACK_NAME": "web-community-cdn-account",
-                "CONFIG_REPO": "byu-oit/web-cdn",
-                "EXTRA_TAGS": "data-sensitivity=public repo=https://github.com/byu-oit/web-cdn",
-                "ENV" : "gha",
-                "ROOT_DNS" : "cdn-gha.byu.edu",
-                "CONFIG_BRANCH": "gha",
-                "CERTIFICATE_ARN" : "arn:aws:acm:us-east-1:632558792265:certificate/d593e652-ac4c-40e1-9d0c-14b0544042f1"
+                "cdn_name": "web-community-cdn",
+                "account_stack_name": "web-community-cdn-account",
+                "config_repo": "byu-oit/web-cdn",
+                "extra_tags": "data-sensitivity=public repo=https://github.com/byu-oit/web-cdn",
+                "env" : "gha",
+                "root_dns" : "cdn-gha.byu.edu",
+                "config_branch": "gha",
+                "certificate_arn" : "arn:aws:acm:us-east-1:632558792265:certificate/d593e652-ac4c-40e1-9d0c-14b0544042f1"
               }
             ]
           }'
@@ -105,7 +105,9 @@ jobs:
         run: lerna bootstrap
 
       - name: Lerna Exec
-        run: lerna exec -- ./codebuild.sh
+        env:
+          cdn_name: ${{ secrets[matrix.cdn_name] }}
+        run: export CDN_NAME=$cdn_name | lerna exec -- ./codebuild.sh
 
       - name: find
         run: find ./* -mtime +10950 -exec touch {} \;
