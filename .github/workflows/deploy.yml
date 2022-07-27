@@ -107,7 +107,7 @@ jobs:
       - name: Lerna Exec
         env:
           root_dns: ${{ secrets[matrix.root_dns] }}
-        run: export ROOT_DNS=$($root_dns) | lerna exec -- ./codebuild.sh
+        run: export ROOT_DNS=$( $root_dns ) | lerna exec -- ./codebuild.sh
 
       - name: find
         run: find ./* -mtime +10950 -exec touch {} \;
