@@ -106,12 +106,12 @@ jobs:
 
       - name: Echo ROOT_DNS
         env:
-          root_dns: ${{ secrets[matrix.root_dns] }}
+          root_dns: ${{ secrets[matrix.env.root_dns] }}
         run: echo $root_dns
 
       - name: Lerna Exec
         env:
-          root_dns: ${{ secrets[matrix.root_dns] }}
+          root_dns: ${{ secrets[matrix.env.root_dns] }}
         run: |
           export ROOT_DNS=$( $root_dns )
           lerna exec -- ./codebuild.sh
