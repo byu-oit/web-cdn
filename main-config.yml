@@ -138,6 +138,10 @@ libraries:
     configuration:
       type: 'javascript'
       prerelease: true
+  browser-oauth-pkce:
+    source: github:byuweb/byu-browser-oauth-pkce
+    configuration:
+      type: 'javascript'
   byu-user-info-oauth:
     source: github:byuweb/byu-user-info-oauth
     configuration:
