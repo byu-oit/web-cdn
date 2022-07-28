@@ -111,7 +111,7 @@ jobs:
 
       - name: Lerna Exec
         env:
-          root_dns: ${{ matrix.env.root_dns }}
+          ROOT_DNS: ${{ matrix.env.root_dns }}
         run: lerna exec -- ./codebuild.sh
 
       - name: find
