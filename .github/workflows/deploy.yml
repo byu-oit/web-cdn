@@ -87,7 +87,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets[matrix.env.aws_key_name] }}
           aws-secret-access-key: ${{ secrets[matrix.env.aws_secret_name] }}
-          aws-region: us-west-2
+          aws-region: us-east-1
 
       - name: Make files executable #Todo test if need this in GHA?
         run: find . -type f -name '*.sh' ! -path '**/node_modules/**' -exec chmod u+x {} \;
