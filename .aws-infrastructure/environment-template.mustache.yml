@@ -15,6 +15,7 @@ Parameters:
       - dev
       - stg
       - prd
+      - gha
   RootDNS:
     Type: String
     Description: The root DNS zone, on which all other DNS zones should be based. Will create 'webhooks.' and 'metrics.' subdomains.
