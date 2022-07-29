@@ -106,29 +106,27 @@ jobs:
 
       - name: Echo ROOT_DNS
         env:
-          root_dns: ${{ secrets[matrix.env.root_dns] }}
+          root_dns: ${{ matrix.env.root_dns }}
         run: echo $root_dns
 
       - name: Lerna Exec
         env:
-          root_dns: ${{ secrets[matrix.env.root_dns] }}
-        run: |
-          export ROOT_DNS=$( $root_dns )
-          lerna exec -- ./codebuild.sh
+          ROOT_DNS: ${{ matrix.env.root_dns }}
+        run: lerna exec -- ./codebuild.sh
 
       - name: find
         run: find ./* -mtime +10950 -exec touch {} \;
 
       - name: deploy
         env:
-          cdn_name: ${{ secrets[matrix.cdn_name] }}
-          env: ${{ secrets[matrix.env] }}
-          root_dns: ${{ secrets[matrix.root_dns] }}
-          account_stack_name: ${{ secrets[matrix.account_stack_name] }}
-          certificate_arn: ${{ secrets[matrix.certificate_arn] }}
-          config_repo: ${{ secrets[matrix.config_repo] }}
-          config_branch: ${{ secrets[matrix.config_branch] }}
-          extra_tags: ${{ secrets[matrix.extra_tags] }}
+          cdn_name: ${{ matrix.env.cdn_name }}
+          env: ${{ matrix.env.env }}
+          root_dns: ${{ matrix.env.root_dns }}
+          account_stack_name: ${{ matrix.env.account_stack_name }}
+          certificate_arn: ${{ matrix.env.certificate_arn }}
+          config_repo: ${{ matrix.env.config_repo }}
+          config_branch: ${{ matrix.env.config_branch }}
+          extra_tags: ${{ matrix.env.extra_tags }}
         run: .aws-infrastructure/deploy-environment.sh $cdn_name $env $root_dns $account_name $certificate_arn $config_repo $config_branch} "$extra_tags"
 
 
