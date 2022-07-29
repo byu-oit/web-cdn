@@ -83,6 +83,7 @@ jobs:
           token: ${{ github.token }}
 
       - name: Configure AWS Credentials
+        id: awscreds
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets[matrix.env.aws_key_name] }}
@@ -111,6 +112,8 @@ jobs:
 
       - name: Lerna Exec
         env:
+          ENV: ${{ matrix.env.env }}
+          AWS_ACCOUNT_ID: ${{ steps.awscreds.outputs.aws-account-id }}
           ROOT_DNS: ${{ matrix.env.root_dns }}
         run: lerna exec -- ./codebuild.sh
 
