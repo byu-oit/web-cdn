@@ -130,7 +130,7 @@ jobs:
           config_repo: ${{ matrix.env.config_repo }}
           config_branch: ${{ matrix.env.config_branch }}
           extra_tags: ${{ matrix.env.extra_tags }}
-        run: .aws-infrastructure/deploy-environment.sh $cdn_name $env $root_dns $account_name $certificate_arn $config_repo $config_branch} "$extra_tags"
+        run: .aws-infrastructure/deploy-environment.sh $cdn_name $env $root_dns $account_stack_name $certificate_arn $config_repo $config_branch} "$extra_tags"
 
 
 #      - name: Start Standard Change
