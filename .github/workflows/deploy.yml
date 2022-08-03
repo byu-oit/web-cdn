@@ -27,7 +27,7 @@ jobs:
                 "rfc_secret_name":"standard_change_sandbox_client_secret",
                 "rfc_template_id":"Codepipeline-Standard-Change",
                 "cdn_name": "web-community-cdn",
-                "account_stack_name": "web-community-cdn-account-gha",
+                "account_stack_name": "web-community-cdn-gha-account",
                 "config_repo": "byu-oit/web-cdn",
                 "extra_tags": "data-sensitivity=public repo=https://github.com/byu-oit/web-cdn",
                 "env" : "gha",
