@@ -52,6 +52,10 @@ Mappings:
       default: 30
       max: 60
       min: 0
+    gha:
+      default: 30
+      max: 60
+      min: 0
   AliasCacheTTL:
     prd:
       default: 600
@@ -68,6 +72,10 @@ Mappings:
       default: 30
       max: 300
       min: 0
+    gha:
+      default: 30
+      max: 300
+      min: 0
   AliasRedirectCacheTime:
     prd:
       user: 3600
@@ -78,6 +86,9 @@ Mappings:
 #      user: 300
 #      cache: 60
     dev:
+      user: 60
+      cache: 60
+    gha:
       user: 60
       cache: 60
   LogPrefixes:
