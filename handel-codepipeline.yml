@@ -63,8 +63,4 @@ pipelines:
           CERTIFICATE_ARN: arn:aws:acm:us-east-1:632558792265:certificate/0a03d94e-ddee-4145-beab-5ae5cd24f516
         build_role: web-community-gha-cdn-cfn-deploy
         cache: s3
-      - type: slack_notify
-        name: Notify
-        message: "GHA CDN Assembler Build Finished (cdn-gha.byu.edu)"
-        channel: "#custom-code-bots"
 

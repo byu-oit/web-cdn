@@ -56,7 +56,7 @@ jobs:
                 "rfc_template_id":"Codepipeline-Standard-Change",
                 "slack_channel":"#slack-bot-testing",
                 "cdn_name": "web-community-cdn",
-                "account_stack_name": "web-community-cdn-account",
+                "account_stack_name": "web-community-cdn-gha-account",
                 "config_repo": "byu-oit/web-cdn",
                 "extra_tags": "data-sensitivity=public repo=https://github.com/byu-oit/web-cdn"
               }
