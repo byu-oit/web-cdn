@@ -120,11 +120,6 @@ jobs:
       - name: find
         run: find ./* -mtime +10950 -exec touch {} \;
 
-      - name: curl test
-        env:
-          root_dns: ${{ matrix.env.root_dns }}
-        run: curl $root_dns
-
       - name: deploy
         env:
           cdn_name: ${{ matrix.env.cdn_name }}
