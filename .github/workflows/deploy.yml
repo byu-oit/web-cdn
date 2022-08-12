@@ -21,19 +21,19 @@ jobs:
           matrix='{
             "env":[
               {
-                "aws_key_name":"byu_oit_webcommunity_dev_key",
-                "aws_secret_name":"byu_oit_webcommunity_dev_secret",
+                "aws_key_name":"byu_oit_fullstack_trn_key",
+                "aws_secret_name":"byu_oit_fullstack_trn_secret",
                 "rfc_key_name":"standard_change_sandbox_client_key",
                 "rfc_secret_name":"standard_change_sandbox_client_secret",
                 "rfc_template_id":"Codepipeline-Standard-Change",
                 "cdn_name": "web-community-cdn",
-                "account_stack_name": "web-community-cdn-gha-account",
+                "account_stack_name": "web-community-cdn-account",
                 "config_repo": "byu-oit/web-cdn",
                 "extra_tags": "data-sensitivity=public repo=https://github.com/byu-oit/web-cdn",
                 "env" : "gha",
                 "root_dns" : "cdn-gha.byu.edu",
                 "config_branch": "gha",
-                "certificate_arn" : "arn:aws:acm:us-east-1:632558792265:certificate/0a03d94e-ddee-4145-beab-5ae5cd24f516"
+                "certificate_arn" : "arn:aws:acm:us-east-1:863362256468:certificate/576c35bd-64af-48cd-89e6-cbd0befc7900"
               }
             ]
           }'
@@ -56,7 +56,7 @@ jobs:
                 "rfc_template_id":"Codepipeline-Standard-Change",
                 "slack_channel":"#slack-bot-testing",
                 "cdn_name": "web-community-cdn",
-                "account_stack_name": "web-community-cdn-gha-account",
+                "account_stack_name": "web-community-cdn-account",
                 "config_repo": "byu-oit/web-cdn",
                 "extra_tags": "data-sensitivity=public repo=https://github.com/byu-oit/web-cdn"
               }
@@ -130,7 +130,7 @@ jobs:
           config_repo: ${{ matrix.env.config_repo }}
           config_branch: ${{ matrix.env.config_branch }}
           extra_tags: ${{ matrix.env.extra_tags }}
-        run: .aws-infrastructure/deploy-environment.sh $cdn_name $env $root_dns $account_stack_name $certificate_arn $config_repo $config_branch} "$extra_tags"
+        run: .aws-infrastructure/deploy-environment.sh $cdn_name $env $root_dns $account_stack_name $certificate_arn $config_repo $config_branch "$extra_tags"
 
 
 #      - name: Start Standard Change

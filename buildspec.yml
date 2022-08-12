@@ -3,7 +3,7 @@ version: 0.2
 env:
   variables:
     CDN_NAME: web-community-cdn
-    ACCOUNT_STACK_NAME: web-community-cdn-gha-account
+    ACCOUNT_STACK_NAME: web-community-cdn-account
     CONFIG_REPO: byu-oit/web-cdn
     EXTRA_TAGS: "data-sensitivity=public repo=https://github.com/byu-oit/web-cdn"
 
