@@ -33,7 +33,7 @@ jobs:
                 "env" : "gha",
                 "root_dns" : "cdn-gha.byu.edu",
                 "config_branch": "gha",
-                "certificate_arn" : "arn:aws:acm:us-east-1:863362256468:certificate/576c35bd-64af-48cd-89e6-cbd0befc7900"
+                "certificate_arn" : "arn:aws:acm:us-east-1:863362256468:certificate/e61adcf0-a9dc-426c-95ce-d5dc7c48c491"
               }
             ]
           }'
