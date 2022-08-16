@@ -60,7 +60,7 @@ pipelines:
           ENV: gha
           ROOT_DNS: cdn-gha.byu.edu
           CONFIG_BRANCH: gha
-          CERTIFICATE_ARN: arn:aws:acm:us-east-1:863362256468:certificate/e7e13037-91c1-4477-9814-992b13218ae6
+          CERTIFICATE_ARN: arn:aws:acm:us-east-1:863362256468:certificate/eba15dd7-e5b1-457d-9a62-044203b6ad4b
         build_role: web-community-gha-cdn-cfn-deploy
         cache: s3
 

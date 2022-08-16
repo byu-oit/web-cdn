@@ -162,7 +162,7 @@ infrastructure:
       settings:
         root-dns: cdn-gha.byu.edu
         account-stack-name: web-community-cdn-account
-        certificate-arn: arn:aws:acm:us-east-1:863362256468:certificate/e7e13037-91c1-4477-9814-992b13218ae6
+        certificate-arn: arn:aws:acm:us-east-1:863362256468:certificate/eba15dd7-e5b1-457d-9a62-044203b6ad4b
     dev:
       settings:
         root-dns: cdn-dev.byu.edu
