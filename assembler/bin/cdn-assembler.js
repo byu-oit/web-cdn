@@ -35,7 +35,7 @@ const args = require('yargs')
     })
     .describe('env', 'environment')
     .alias('env', 'e')
-    .choices('env', ['prd', 'stg', 'dev'])
+    .choices('env', ['prd', 'stg', 'dev', 'gha']) //TODO remove GHA before merging
     .option('bucket', {
         alias: 'b',
         describe: 'target bucket',
