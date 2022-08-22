@@ -18,6 +18,5 @@
 "use strict";
 
 module.exports = {
-    SlackMessager: require('./slack-messager'),
     NoopMessager: require('./noop-messager'),
 };

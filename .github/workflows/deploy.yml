@@ -50,11 +50,10 @@ jobs:
             "env":[
               {
                 "aws_key_name":"byu_oit_webcommunity_prd_key",
-                "aws_secret_name":"byu_oit_webcommunity_dev_secret",
-                "rfc_key_name":"standard_change_sandbox_client_key",
-                "rfc_secret_name":"standard_change_sandbox_client_secret",
+                "aws_secret_name":"byu_oit_webcommunity_prd_secret",
+                "rfc_key_name":"standard_change_production_client_key",
+                "rfc_secret_name":"standard_change_production_client_secret",
                 "rfc_template_id":"Codepipeline-Standard-Change",
-                "slack_channel":"#slack-bot-testing",
                 "cdn_name": "web-community-cdn",
                 "account_stack_name": "web-community-cdn-account",
                 "config_repo": "byu-oit/web-cdn",

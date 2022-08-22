@@ -64,8 +64,6 @@ const args = require('yargs')
         alias: 'w',
         describe: 'Directory in which to assemble the CDN contents. Must be empty.'
     })
-    .option('slack-url', {describe: 'Slack Webhook URL for build notifications'})
-    .option('slack-channel', {describe: 'Slack Channel for build notifications'})
     .describe('verbose', 'turns on verbose logging')
     .alias('verbose', 'v')
     .boolean('verbose')
@@ -107,8 +105,6 @@ async function runAssembler(args) {
         env: args.env,
         cdnHost: args.cdnHost,
         forceBuild: args.forceBuild,
-        slackUrl: args.slackUrl,
-        slackChannel: args.slackChannel,
     })
 }
 

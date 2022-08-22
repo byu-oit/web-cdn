@@ -35,7 +35,6 @@ const downloadSources = require('./src/download-sources');
 const {uploadFiles} = require('./src/upload-files');
 const buildLayout = require('./src/build-layout');
 const constants = require('./src/constants');
-const {NoopMessager, SlackMessager} = require('./src/messagers');
 
 module.exports = async function cdnAssembler(config, targetBucket, opts) {
     let {workDir, githubCredentials, env} = (opts || {});
@@ -54,8 +53,6 @@ module.exports = async function cdnAssembler(config, targetBucket, opts) {
 
     let sourceDir = path.join(workDir, 'sources');
     let assembledDir = path.join(workDir, 'assembled');
-
-    const messages = initMessager(opts);
 
     const buildContext = {
         config,
@@ -277,16 +274,6 @@ async function setupGithubCredentials(credentials, env) {
     }
 
     await GithubProvider.setCredentials(actual.user, actual.token);
-}
-
-function initMessager({slackUrl, slackChannel}) {
-    if (slackUrl) {
-        console.log('Initializing Slack Messager. Callback URL', slackUrl, 'channel', slackChannel);
-        return new SlackMessager({webhookUrl: slackUrl, channel: slackChannel});
-    } else {
-        console.log('Initializing Console Messager');
-        return new NoopMessager();
-    }
 }
 
 function manifestVersionChanged(oldManifest, newManifest) {
