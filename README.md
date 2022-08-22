@@ -1,6 +1,6 @@
 # BYU Web Community CDN
 
-Welcome the source of the BYU Web Community CDN!  This CDN aims to host all of the resources you need to use the
+Welcome the source of the BYU Web Community CDN!  This CDN aims to host all the resources you need to use the
 official BYU Look and Feel on your website.
 
 The CDN is now maintained by OIT. The source code for the previous version 1 of the CDN can be found in the 
@@ -89,36 +89,36 @@ possible for all resources created.
 1. Create a new CloudFormation stack using [account-and-iam.yml](.aws-infrastructure/account-and-iam.yml) as the 
 template. Give the stack a name of `web-community-cdn-account` and specify other parameters. The CDNName parameter 
 should be "web-community-cdn".
-2. Create a new Route 53 Hosted Zone with a URL matching the URL in the 
-[handel-codepipeline.yml](handel-codepipeline.yml) file.
-3. Use [this order form](https://it.byu.edu/it/?id=sc_cat_item&sys_id=2f7a54251d635d005c130b6c83f2390a) to request an A 
+2. Create a new Route 53 Hosted Zone with an appropriate URl:
+   - cdn.byu.edu (PRD)
+   - cdn-dev.byu.edu (DEV)
+   - cdn-{env}.byu.edu (any other environment)
+3. Use [this order form](https://it.byu.edu/it/?id=sc_cat_item&sys_id=2f7a54251d635d005c130b6c83f2390a) to request an NS 
 record pointing to the NS servers in the created hosted zone. Wait for that request to be completed before moving on.
-4. Create a new ACM certificate for the URL used in step two. On the "Validation" step, expand the domain name and 
-click the "Create record in Route 53" box before clicking "Continue". Once complete, wait for AWS to validate the 
-certificate before continuing.
-5. Update the appropriate pipeline in the [handel-codepipeline.yml](handel-codepipeline.yml) with the ARN of the ACM 
-certificate made (`CERTIFICATE_ARN`).
+4. Create a new ACM certificate for the URL used in step two, and the subdomain. For example, `cdn-dev.byu.edu` _and_ `*.cdn-dev.byu.edu`. After it is made, 
+click the "Create record in Route 53" to link the certificate to the Route 53 zone you have created. Once complete, wait for AWS to validate the 
+certificate before continuing. 
 6. Update the certificate ARN and URL for the appropriate stage in the infrastructure section of 
-[main-config.yml](main-config.yml).
+[main-config.yml](main-config.yml), and in the [deployment GitHub action](./.github/workflows/deploy.yml)
 7. Create the following parameters in SSM Parameter Store:
-  - `web-community-cdn.{env}.slack-webhook`: The webhook CDN update alerts should be sent to
-  - `web-community-cdn.{env}.slack-channel`: The channel CDN update alerts should be sent to
+  - ~~`web-community-cdn.{env}.slack-webhook`: The webhook CDN update alerts should be sent to~~
+  - ~~`web-community-cdn.{env}.slack-channel`: The channel CDN update alerts should be sent to~~
   - `web-community-cdn.{env}.github-user`: The GitHub user to connect to GitHub with.
   - `web-community-cdn.{env}.github-token`: The token of the user to connect to GitHub with.
-8. Reach out to an AWS admin to deploy the Handel CodePipeline. Wait for it to successfully deploy its CloudFormation 
+8. Push changes to the GitHub repo and watch the GitHub action deployment for any issues. Wait for it to successfully deploy its CloudFormation 
 template before continuing (the pipeline will fail because DNS isn't completely setup yet).
 9. Copy the validation CNAME record from the original hosted zone create to the hosted zone (with the same name) 
 created by CloudFormation. 
 10. Use [the same order form](https://it.byu.edu/it/?id=sc_cat_item&sys_id=2f7a54251d635d005c130b6c83f2390a) to request 
-the A record for the URL points to the NS servers in the CloudFormation-created hosted zone. Wait for that request to 
+the NS record for the URL points to the NS servers in the CloudFormation-created hosted zone. Wait for that request to 
 be completed and for changes to propagate before moving on.
-11. Rerun the pipeline so that it can finish succesfully.
+11. Rerun the pipeline in GitHub actions so that it can finish successfully.
 12. Delete the manually created hosted zone.
 
 ## TODOs
 
-- Remove redundant files (todos.md, wishlist.md, etc.)
-- Switch to Terraform and GHA
+- Remove redundant files (wishlist.md, etc.)
+- Switch to Terraform
 - Use latest recommended node version
 - Cache docker images
 - Use a GitHub bot we can control

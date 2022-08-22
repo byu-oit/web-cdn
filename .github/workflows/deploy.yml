@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: [gha, dev, master] #gha for pre-dev testing
+    branches: [gha, dev, master] # TODO gha for pre-dev testing
     paths-ignore:
       - LICENSE
       - README.md
@@ -40,11 +40,7 @@ jobs:
           echo matrix=`echo $matrix | jq -c .` >> $GITHUB_ENV
 
       - name: Set up PRD Environment Variables
-        if: github.ref == 'refs/heads/main'
-        # TODO: When prd really is production, in prd environment (first block below):
-        # * Change standard_change_sandbox_client_key to standard_change_production_client_key
-        # * Change standard_change_sandbox_client_secret to standard_change_production_client_secret
-        # You probably don't want to do this in cpy (second block), or you will get two RFCs everytime you push to master
+        if: github.ref == 'refs/heads/master'
         run: |
           matrix='{
             "env":[
@@ -98,9 +94,6 @@ jobs:
       - name: Install AWSCLI
         run: pip install awscli --upgrade --user
 
-#      - name: Setup
-#        run: mkdir -p /temp/.cache/yarn && yarn config set cache-folder /temp/.cache/yarn #TODO fix
-
       - name: Lerna Boostrap
         run: lerna bootstrap
 
@@ -119,6 +112,14 @@ jobs:
       - name: find
         run: find ./* -mtime +10950 -exec touch {} \;
 
+#      - name: Start Standard Change
+#        uses: byu-oit/github-action-start-standard-change@v1
+#        id: start-standard-change
+#        with:
+#          client-key: ${{ secrets[matrix.env.rfc_key_name] }}
+#          client-secret: ${{ secrets[matrix.env.rfc_secret_name] }}
+#          template-id: ${{ matrix.env.rfc_template_id }}
+
       - name: deploy
         env:
           cdn_name: ${{ matrix.env.cdn_name }}
@@ -130,16 +131,6 @@ jobs:
           config_branch: ${{ matrix.env.config_branch }}
           extra_tags: ${{ matrix.env.extra_tags }}
         run: .aws-infrastructure/deploy-environment.sh $cdn_name $env $root_dns $account_stack_name $certificate_arn $config_repo $config_branch "$extra_tags"
-
-
-#      - name: Start Standard Change
-#        uses: byu-oit/github-action-start-standard-change@v1
-#        id: start-standard-change
-#        with:
-#          client-key: ${{ secrets[matrix.env.rfc_key_name] }}
-#          client-secret: ${{ secrets[matrix.env.rfc_secret_name] }}
-#          template-id: ${{ matrix.env.rfc_template_id }}
-
 
 #      - name: End Standard Change
 #        uses: byu-oit/github-action-end-standard-change@v1
