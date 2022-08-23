@@ -10,6 +10,3 @@ phases:
         --env $BUILD_ENV
         --verbose
         --cdn-host $CDN_HOST
-        --slack-url $SLACK_WEBHOOK_URL
-        --slack-channel $SLACK_CHANNEL
-

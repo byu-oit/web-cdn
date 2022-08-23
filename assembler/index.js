@@ -35,7 +35,6 @@ const downloadSources = require('./src/download-sources');
 const {uploadFiles} = require('./src/upload-files');
 const buildLayout = require('./src/build-layout');
 const constants = require('./src/constants');
-const {NoopMessager, SlackMessager} = require('./src/messagers');
 
 module.exports = async function cdnAssembler(config, targetBucket, opts) {
     let {workDir, githubCredentials, env} = (opts || {});
@@ -55,8 +54,6 @@ module.exports = async function cdnAssembler(config, targetBucket, opts) {
     let sourceDir = path.join(workDir, 'sources');
     let assembledDir = path.join(workDir, 'assembled');
 
-    const messages = initMessager(opts);
-
     const buildContext = {
         config,
         targetBucket,
@@ -69,7 +66,6 @@ module.exports = async function cdnAssembler(config, targetBucket, opts) {
         },
         cdnHost: opts.cdnHost,
         env: opts.env,
-        messages,
         started: new Date(),
     };
 
@@ -99,7 +95,6 @@ module.exports = async function cdnAssembler(config, targetBucket, opts) {
 
         if (!hasPlannedActions(actions)) {
             log.info("No planned actions. Exiting.");
-            await messages.sendSuccess(buildContext);
             return;
         }
 
@@ -123,9 +118,7 @@ module.exports = async function cdnAssembler(config, targetBucket, opts) {
         await uploadFiles(buildContext, filesystem, actions, newManifest);
         // await uploadFiles(oldManifest, newManifest, versionManifests, actions, targetBucket, assembledDir, cdnHost, dryRun);
 
-        await messages.sendSuccess(buildContext);
     } catch (err) {
-        await messages.sendError(buildContext, err);
         process.exit(1);
     }
 };
@@ -277,16 +270,6 @@ async function setupGithubCredentials(credentials, env) {
     }
 
     await GithubProvider.setCredentials(actual.user, actual.token);
-}
-
-function initMessager({slackUrl, slackChannel}) {
-    if (slackUrl) {
-        console.log('Initializing Slack Messager. Callback URL', slackUrl, 'channel', slackChannel);
-        return new SlackMessager({webhookUrl: slackUrl, channel: slackChannel});
-    } else {
-        console.log('Initializing Console Messager');
-        return new NoopMessager();
-    }
 }
 
 function manifestVersionChanged(oldManifest, newManifest) {
