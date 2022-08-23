@@ -66,7 +66,6 @@ module.exports = async function cdnAssembler(config, targetBucket, opts) {
         },
         cdnHost: opts.cdnHost,
         env: opts.env,
-        messages,
         started: new Date(),
     };
 
@@ -96,7 +95,6 @@ module.exports = async function cdnAssembler(config, targetBucket, opts) {
 
         if (!hasPlannedActions(actions)) {
             log.info("No planned actions. Exiting.");
-            await messages.sendSuccess(buildContext);
             return;
         }
 
@@ -120,9 +118,7 @@ module.exports = async function cdnAssembler(config, targetBucket, opts) {
         await uploadFiles(buildContext, filesystem, actions, newManifest);
         // await uploadFiles(oldManifest, newManifest, versionManifests, actions, targetBucket, assembledDir, cdnHost, dryRun);
 
-        await messages.sendSuccess(buildContext);
     } catch (err) {
-        await messages.sendError(buildContext, err);
         process.exit(1);
     }
 };
