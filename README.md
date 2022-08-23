@@ -89,13 +89,14 @@ possible for all resources created.
 1. Create a new CloudFormation stack using [account-and-iam.yml](.aws-infrastructure/account-and-iam.yml) as the 
 template. Give the stack a name of `web-community-cdn-account` and specify other parameters. The CDNName parameter 
 should be "web-community-cdn".
-2. Create a new Route 53 Hosted Zone with an appropriate URl:
+2. To deploy to any environment besides `dev` and `prd`, add the environment to files [env-template](./.aws-infrastructure/environment-template.mustache.yml),
+[cdn-assembler](./assembler/bin/cdn-assembler.js), and [main-config](main-config.yml)
+3. Create a new Route 53 Hosted Zone with an appropriate URl:
    - cdn.byu.edu (PRD)
    - cdn-dev.byu.edu (DEV)
-   - cdn-{env}.byu.edu (any other environment)
-3. Use [this order form](https://it.byu.edu/it/?id=sc_cat_item&sys_id=2f7a54251d635d005c130b6c83f2390a) to request an NS 
+4. Use [this order form](https://it.byu.edu/it/?id=sc_cat_item&sys_id=2f7a54251d635d005c130b6c83f2390a) to request an NS 
 record pointing to the NS servers in the created hosted zone. Wait for that request to be completed before moving on.
-4. Create a new ACM certificate for the URL used in step two, and the subdomain. For example, `cdn-dev.byu.edu` _and_ `*.cdn-dev.byu.edu`. After it is made, 
+5. Create a new ACM certificate for the URL used in step two, and the subdomain. For example, `cdn-dev.byu.edu` _and_ `*.cdn-dev.byu.edu`. After it is made, 
 click the "Create record in Route 53" to link the certificate to the Route 53 zone you have created. Once complete, wait for AWS to validate the 
 certificate before continuing. 
 6. Update the certificate ARN and URL for the appropriate stage in the infrastructure section of 
