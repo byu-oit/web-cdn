@@ -113,13 +113,13 @@ jobs:
       - name: find
         run: find ./* -mtime +10950 -exec touch {} \;
 
-#      - name: Start Standard Change
-#        uses: byu-oit/github-action-start-standard-change@v1
-#        id: start-standard-change
-#        with:
-#          client-key: ${{ secrets[matrix.env.rfc_key_name] }}
-#          client-secret: ${{ secrets[matrix.env.rfc_secret_name] }}
-#          template-id: ${{ matrix.env.rfc_template_id }}
+      - name: Start Standard Change
+        uses: byu-oit/github-action-start-standard-change@v1
+        id: start-standard-change
+        with:
+          client-key: ${{ secrets[matrix.env.rfc_key_name] }}
+          client-secret: ${{ secrets[matrix.env.rfc_secret_name] }}
+          template-id: ${{ matrix.env.rfc_template_id }}
 
       - name: deploy
         env:
@@ -133,12 +133,12 @@ jobs:
           extra_tags: ${{ matrix.env.extra_tags }}
         run: .aws-infrastructure/deploy-environment.sh $cdn_name $env $root_dns $account_stack_name $certificate_arn $config_repo $config_branch "$extra_tags"
 
-#      - name: End Standard Change
-#        uses: byu-oit/github-action-end-standard-change@v1
-#        if: always() && steps.start-standard-change.outcome == 'success' # Run if RFC started, even if the deploy failed
-#        with:
-#          client-key: ${{ secrets[matrix.env.rfc_key_name] }}
-#          client-secret: ${{ secrets[matrix.env.rfc_secret_name] }}
-#          change-sys-id: ${{ steps.start-standard-change.outputs.change-sys-id }}
-#          work-start: ${{ steps.start-standard-change.outputs.work-start }}
-#          success: ${{ steps.deploy.outcome == 'success' }}
+      - name: End Standard Change
+        uses: byu-oit/github-action-end-standard-change@v1
+        if: always() && steps.start-standard-change.outcome == 'success' # Run if RFC started, even if the deploy failed
+        with:
+          client-key: ${{ secrets[matrix.env.rfc_key_name] }}
+          client-secret: ${{ secrets[matrix.env.rfc_secret_name] }}
+          change-sys-id: ${{ steps.start-standard-change.outputs.change-sys-id }}
+          work-start: ${{ steps.start-standard-change.outputs.work-start }}
+          success: ${{ steps.deploy.outcome == 'success' }}
