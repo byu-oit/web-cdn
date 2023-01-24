@@ -116,6 +116,36 @@ be completed and for changes to propagate before moving on.
 11. Rerun the pipeline in GitHub actions so that it can finish successfully.
 12. Delete the manually created hosted zone.
 
+## Architecture
+The CDN's main architecture uses AWS Cloudfront and S3 to server up files (which is similar to a typical static website). 
+Additionally, these parts exist:
+- [Eager Redirect Edge Lambda](edge-lambdas/eager-redirect)
+    - Called before going to the s3 bucket
+    - This lambda is primarily responsible for redirecting aliases so that the calls don't need to 
+      go to the s3 bucket first to redirect (which makes it faster).
+- [Enhanced Headers Edge Lambda](edge-lambdas/enhanced-headers)
+    - Called after going to the s3 bucket
+    - Changes 301 redirects to 302 redirects
+    - Takes S3 metadata and adds them as http headers
+- The ["assembler"](assembler)
+  - This deploys libraries into the CDN and all relevant metadata
+  - There is a ["webhook" lambda](webhooks) function that is invoked via Github webhooks
+    - When invoked it starts a code build process that starts the main assembler process
+  - The codebuild process does several things:
+    - It uses the [main-config.yml](main-config.yml) file to set what repositories it pulls from and some options for the those libraries/assets
+    - It determines what has changed in code and what new branches exist that need to be pushed to the S3 bucket and does so
+    - It produces a redirects.json and redirects.json.gz file in the .cdn-infra directory in the s3 bucket
+        - The Eager Redirect Lambda uses this to eagerly redirect aliases
+    - It also produces a mainfest.json file that has information about all the branches of Github repos
+      used as sources for libraries
+        - The manifest helps manage finding the difference between what has been deployed and what needs to be deployed.
+- [Log Analyzer Sorter Lambda](log-analyzer)
+  - Helps organize cloudwatch access logs by date
+  - This lambda is triggered by adding a s3 object to the access log bucket
+  - It makes a copy of the s3 file to another path that is organized like /year-month/day/hour/{file}
+  - This lambda may not be necessary, but is a good way to partition (if we were doing so)
+    - Mostly in line with this recommendation for partitioning: https://aws.amazon.com/blogs/big-data/analyze-your-amazon-cloudfront-access-logs-at-scale/
+
 ## TODOs
 
 - Remove redundant files (wishlist.md, etc.)
