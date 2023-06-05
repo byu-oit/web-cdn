@@ -14,6 +14,10 @@
 #
 #pip install yq
 
+#Just for logging purposes
+node --version
+npm --version
+
 npm install -g yarn
 
 echo "Installing lerna"
