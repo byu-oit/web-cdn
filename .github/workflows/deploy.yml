@@ -72,6 +72,7 @@ jobs:
     needs: env
     strategy:
       matrix: ${{ fromJson(needs.env.outputs.matrix) }}
+    permissions: write-all
     steps:
       - name: Check out
         uses: actions/checkout@v3
