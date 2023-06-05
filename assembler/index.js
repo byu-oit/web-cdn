@@ -35,6 +35,7 @@ const downloadSources = require('./src/download-sources');
 const {uploadFiles} = require('./src/upload-files');
 const buildLayout = require('./src/build-layout');
 const constants = require('./src/constants');
+const {NoopMessager} = require('./src/messagers');
 
 module.exports = async function cdnAssembler(config, targetBucket, opts) {
     let {workDir, githubCredentials, env} = (opts || {});
@@ -66,6 +67,7 @@ module.exports = async function cdnAssembler(config, targetBucket, opts) {
         },
         cdnHost: opts.cdnHost,
         env: opts.env,
+        messages: new NoopMessager(),
         started: new Date(),
     };
 
