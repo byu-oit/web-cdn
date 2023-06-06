@@ -118,6 +118,7 @@ be completed and for changes to propagate before moving on.
 
 ## TODOs
 
+- **RE-CREATE the CodeBuild creator that was deleted with handel-codebuild in commit 2ba4a38**
 - Remove redundant files (wishlist.md, etc.)
 - Switch to Terraform
 - Use latest recommended node version
