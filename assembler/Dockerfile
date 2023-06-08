@@ -4,12 +4,9 @@ FROM node:12.20.1-alpine
 RUN apk --no-cache add python3 git
 
 ## Install AWS CLI
-RUN apk --no-cache add curl && \
-    curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "/tmp/awscli-bundle.zip" && \
-    unzip /tmp/awscli-bundle.zip -d /tmp && \
-    python3 /tmp/awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws && \
-    apk --no-cache del curl && \
-    rm -rf /tmp/awscli-bundle*
+RUN apk --no-cache add py3-pip && \
+    pip install awscli && \
+    apk --no-cache del py3-pip
 
 ENV ASSEMBLER_HOME=/usr/src/assembler/
 
