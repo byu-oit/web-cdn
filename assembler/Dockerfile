@@ -1,4 +1,4 @@
-FROM node:12.20.1-alpine
+FROM node:18-alpine
 
 ## Install python (for AWS CLI) and git
 RUN apk --no-cache add python3 git
