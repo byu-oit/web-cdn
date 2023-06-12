@@ -20,7 +20,6 @@
 const fs = require('fs-extra');
 const {promisify} = require('util');
 const path = require('path');
-const brotli = require('iltorb');
 const mime = require('mime');
 const moment = require('moment-timezone');
 const deepcopy = require('deepcopy');
@@ -457,15 +456,6 @@ const textSuffixes = [
     '+xml'
 ];
 
-function brotliModeFor(mimeType) {
-    if (isTextMime(mimeType)) {
-        return 1;
-    } else if (mimeType.startsWith('font')) {
-        return 2;
-    }
-    return 0;
-}
-
 function isTextMime(type) {
     if (textPrefixes.some(it => type.startsWith(it))) {
         return true;
@@ -622,7 +612,6 @@ async function getSizeFor(content, type, sha) {
     if (compressible) {
         gzip = (await gzipIt(content)).length;
         br = -1;
-        // br = (await brotli.compress(content, {mode: brotliModeFor(type)})).length
     }
 
     const result = {compressible, unencoded, gzip, br};
