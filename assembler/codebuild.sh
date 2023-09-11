@@ -23,6 +23,7 @@ docker build . -t $image --cache-from $image
 
 echo "Run Tests"
 
+
 docker run --rm -i $image /bin/sh -c 'cd $ASSEMBLER_HOME; yarn install; yarn test'
 
 echo Pushing image as $image
