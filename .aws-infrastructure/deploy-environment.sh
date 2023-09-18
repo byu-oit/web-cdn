@@ -84,6 +84,9 @@ parameters="CDNName=${cdnName}
  ConfigurationGithubRepo=${configGithubRepo}
  ConfigurationGithubBranch=${configGithubBranch}"
 
+# Wait until the previous update is complete
+aws cloudformation wait stack-update-complete --stack-name ${stackname}
+
 echo "Deploying ${stackname} with parameters ${parameters} and tags ${tags}"
 
 if aws cloudformation deploy \
