@@ -55,6 +55,8 @@ module.exports = async function cdnAssembler(config, targetBucket, opts) {
     let sourceDir = path.join(workDir, 'sources');
     let assembledDir = path.join(workDir, 'assembled');
 
+    const messages = new NoopMessager();
+
     const buildContext = {
         config,
         targetBucket,
