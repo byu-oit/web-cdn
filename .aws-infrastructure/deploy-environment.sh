@@ -5,6 +5,7 @@ if [ "$#" -lt 7 ]; then
   exit 1
 fi
 
+
 cdnName=$1
 env=$2
 rootDns=$3
