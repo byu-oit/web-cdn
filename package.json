@@ -19,6 +19,6 @@
     "install": "find ./node_modules/* -mtime +10950 -exec touch {} \\;"
   },
   "devDependencies": {
-    "lerna": "^3.0.0"
+    "lerna": "^5.0.0"
   }
 }
