@@ -22,7 +22,7 @@ npm install -g yarn
 
 echo "Installing lerna"
 
-yarn global add "lerna@^2.4.0"
+yarn global add "lerna@^6.0.0"
 
 yarn global add mustache
 
