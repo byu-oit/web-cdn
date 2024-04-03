@@ -3,7 +3,7 @@ terraform {
   backend "s3" {
     bucket         = "terraform-state-storage-632558792265"
     dynamodb_table = "terraform-state-lock-632558792265"
-    key            = "web-cdn/dev/setup.tfstate"
+    key            = "web-cdn/dev/app.tfstate"
     region         = "us-west-2"
   }
   required_providers {
@@ -22,10 +22,6 @@ locals {
   env = "dev"
 }
 
-variable "cdn_name" {
-  type = string
-}
-
 provider "aws" {
   region = "us-west-2"
 
@@ -39,8 +35,12 @@ provider "aws" {
   }
 }
 
-module "setup" {
-  source = "../../modules/setup/"
+variable "cdn_name" {
+  type = string
+}
+
+module "app" {
+  source = "../../modules/app/"
   env    = local.env
   cdn_name = var.cdn_name
 }

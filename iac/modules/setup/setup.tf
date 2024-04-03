@@ -8,6 +8,10 @@ locals {
   gh_repo = "web-cdn"
 }
 
+variable "cdn_name" {
+  type = string
+}
+
 module "acs" {
   source = "github.com/byu-oit/terraform-aws-acs-info?ref=v4.0.0"
 }
@@ -23,3 +27,10 @@ module "gha_role" {
   oidc_fully_qualified_audiences = ["sts.amazonaws.com"]
   oidc_subjects_with_wildcards   = ["repo:${local.gh_org}/${local.gh_repo}:*"]
 }
+
+# AssemblerRepository
+module "my_ecr" {
+  source = "github.com/byu-oit/terraform-aws-ecr?ref=v2.0.1"
+  name   = "${var.cdn_name}-assembler"
+}
+

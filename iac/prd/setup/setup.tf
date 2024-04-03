@@ -36,6 +36,6 @@ provider "aws" {
 }
 
 module "setup" {
-  source      = "../../modules/setup/"
-  env         = local.env
+  source = "../../modules/setup/"
+  env    = local.env
 }
