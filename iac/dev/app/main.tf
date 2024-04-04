@@ -48,4 +48,8 @@ module "app" {
   env    = local.env
   cdn_name = var.cdn_name
   image_tag = var.image_tag
+  s3_bucket_name = "${var.cdn_name}-${local.env}-contents"
+  index_document_name = "index.html"
+  error_document_name = "error.html"
+  force_destroy = true
 }
