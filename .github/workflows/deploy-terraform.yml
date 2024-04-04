@@ -1,11 +1,13 @@
 name: Deploy
 
 on:
-  push:
-    branches: [dev]
-    paths-ignore:
-      - LICENSE
-      - README.md
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+#  push:
+#    branches: [dev, master]
+#    paths-ignore:
+#      - LICENSE
+#      - README.md
 concurrency: ${{ github.ref }}
 env:
   tf_version: "1.1.7" # must match value in terraform-iac/*/app/main.tf
