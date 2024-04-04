@@ -1,8 +1,8 @@
 terraform {
   required_version = "1.4.5"
   backend "s3" {
-    bucket         = "terraform-state-storage-632558792265"
-    dynamodb_table = "terraform-state-lock-632558792265"
+    bucket         = "terraform-state-storage-863362256468" # TODO: change to true account
+    dynamodb_table = "terraform-state-lock-863362256468"
     key            = "web-cdn/dev/app.tfstate"
     region         = "us-west-2"
   }
@@ -16,6 +16,10 @@ terraform {
       version = "~> 2.4"
     }
   }
+}
+
+variable "image_tag" {
+  type = string
 }
 
 locals {
@@ -43,4 +47,5 @@ module "app" {
   source = "../../modules/app/"
   env    = local.env
   cdn_name = var.cdn_name
+  image_tag = var.image_tag
 }
