@@ -153,6 +153,7 @@ Resources:
               - Effect: "Allow"
                 Action: "codebuild:StartBuild"
                 Resource: !Sub "arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:project/${CDNName}-*-assembler"
+
   EdgeLambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:

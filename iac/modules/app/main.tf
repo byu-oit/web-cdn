@@ -118,32 +118,45 @@ resource "aws_iam_role_policy_attachment" "AllowAssemblerImageAccessAttachment" 
   policy_arn = aws_iam_policy.AllowAssemblerImageAccess.arn
 }
 
+data "aws_iam_policy_document" "ecs_invokation_policy" {
+  description = "Allows CDN gateway access to invoke an ECS task to do the build"
+  version = "2012-10-17"
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    principals {
+      identifiers = ["ecs-tasks.amazonaws.com"]
+      type        = "Service"
+    }
+  }
+}
+
 # CdnBuildInvokerRole TODO start ecs task
-#resource "aws_iam_role" "CdnBuildInvokerRole" {
-#  name = "CdnBuildInvokerRole"
-#  assume_role_policy = jsonencode({
-#    "Version" : "2012-10-17",
-#    "Statement" : [
-#      {
-#        "Effect" : "Allow",
-#        "Principal" : {
-#          "Service" : "lambda.amazonaws.com"
-#        },
-#        "Action" : "sts:AssumeRole"
-#      },
-#      {
-#        "Effect" : "Allow",
-#        "Action" : "codebuild:StartBuild",
-#        "Resource" : "arn:aws:codebuild:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:project/${var.cdn_name}-*-assembler"
-#      }
-#    ]
-#  })
-#  path                 = "/${var.cdn_name}/"
-#  permissions_boundary = module.acs.role_permissions_boundary.arn
-#  managed_policy_arns = [
-#    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-#  ]
-#}
+resource "aws_iam_role" "CdnBuildInvokerRole" {
+  name = "CdnBuildInvokerRole"
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "lambda.amazonaws.com"
+        },
+        "Action" : "sts:AssumeRole"
+      },
+    ]
+  })
+  path                 = "/${var.cdn_name}/"
+  permissions_boundary = module.acs.role_permissions_boundary.arn
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+  ]
+}
+
+resource "aws_iam_role_policy_attachment" "task_execution_policy_attach" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+  role       = aws_iam_role.CdnBuildInvokerRole.name
+}
 
 # EdgeLambdaExecutionRole
 resource "aws_iam_role" "EdgeLambdaExecutionRole" {
