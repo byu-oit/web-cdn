@@ -1,0 +1,60 @@
+
+# TODO possibly add allow CORS
+resource "aws_s3_bucket" "LogBucket" {
+  bucket = "${var.cdn_name}-${var.env}-logs-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}"
+}
+
+resource "aws_s3_bucket_public_access_block" "log_bucket" {
+  bucket = aws_s3_bucket.CdnContentBucket.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_ownership_controls" "log_bucket" {
+  bucket = aws_s3_bucket.CdnContentBucket.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "log_bucket_config" {
+  bucket = aws_s3_bucket.CdnContentBucket.id
+
+  rule {
+    id = "ExpireUnprocessedLogs"
+    status = "Enabled"
+    expiration {
+      days = 60
+    }
+    filter {
+      prefix = local.unprocessed_log_prefix
+    }
+  }
+
+  rule {
+    id = "UnprocessedLogsToInfrequentAccess"
+    status = "Enabled"
+    filter {
+      prefix = local.unprocessed_log_prefix
+    }
+    transition {
+      days          = 30
+      storage_class = "STANDARD_IA"
+    }
+  }
+
+  rule {
+    id = "ExpirePreprocessedLogs"
+    status = "Enabled"
+    expiration {
+      days = 10
+    }
+    filter {
+      prefix = local.preprocessed_log_prefix
+    }
+  }
+
+}

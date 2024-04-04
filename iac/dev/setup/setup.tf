@@ -22,10 +22,6 @@ locals {
   env = "dev"
 }
 
-variable "cdn_name" {
-  type = string
-}
-
 provider "aws" {
   region = "us-east-1"
 
@@ -40,7 +36,7 @@ provider "aws" {
 }
 
 module "setup" {
-  source = "../../modules/setup/"
-  env    = local.env
-  cdn_name = var.cdn_name
+  source   = "../../modules/setup/"
+  env      = local.env
+  cdn_name = "cdn-terraform"
 }

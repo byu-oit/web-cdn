@@ -23,7 +23,8 @@ variable "image_tag" {
 }
 
 locals {
-  env = "dev"
+  env      = "dev"
+  cdn_name = "cdn-terraform"
 }
 
 provider "aws" {
@@ -39,17 +40,16 @@ provider "aws" {
   }
 }
 
-variable "cdn_name" {
-  type = string
-}
-
 module "app" {
-  source = "../../modules/app/"
-  env    = local.env
-  cdn_name = var.cdn_name
-  image_tag = var.image_tag
-  s3_bucket_name = "${var.cdn_name}-${local.env}-contents"
+  source              = "../../modules/app/"
+  env                 = local.env
+  cdn_name            = local.cdn_name
+  image_tag           = var.image_tag
+  s3_bucket_name      = "${local.cdn_name}-${local.env}-contents"
   index_document_name = "index.html"
   error_document_name = "error.html"
-  force_destroy = true
+  site_url            = "https://${local.cdn_name}.byu-oit-fullstack-trn.amazon.byu.edu"
+  default_ttl         = 30
+  max_ttl             = 60
+  min_ttl             = 0
 }
