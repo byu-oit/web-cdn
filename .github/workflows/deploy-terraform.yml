@@ -35,8 +35,8 @@ jobs:
                 "root_dns" : "cdn-dev.byu.edu",
                 "config_branch": "terraform",
                 "certificate_arn" : "arn:aws:acm:us-east-1:632558792265:certificate/1bc2f81c-2f79-46b3-9d3b-54ce672ba8be",
-                "assembler_ecr_repo_name" : "web-cdn-dev-assembler"
-                "tf_working_dir":"./iac/dev/app",
+                "assembler_ecr_repo_name" : "web-cdn-dev-assembler",
+                "tf_working_dir":"./iac/dev/app"
               }
             ]
           }'
@@ -61,8 +61,8 @@ jobs:
                 "root_dns" : "cdn.byu.edu",
                 "config_branch": "master",
                 "certificate_arn" : "arn:aws:acm:us-east-1:204581410681:certificate/18c1b547-de51-43d3-afa5-2bd05493c41c"
-                "assembler_ecr_repo_name": "web-cdn-prd-assembler"
-                "tf_working_dir":"./iac/prd/app",
+                "assembler_ecr_repo_name": "web-cdn-prd-assembler",
+                "tf_working_dir":"./iac/prd/app"
               }
             ]
           }'
