@@ -5,7 +5,7 @@ module "assembler" {
 
   primary_container_definition = {
     name  = "${var.cdn_name}-${var.env}-assembler"
-    image = "${data.aws_ecr_repository.assembler_ecr_repo}:${var.image_tag}"
+    image = "${data.aws_ecr_repository.assembler_ecr_repo.name}:${var.image_tag}" # FIXME: should name be used?
     task_cpu = 4096
     task_memory = 8192
     environment_variables = { # TODO: Fill in missing refs
