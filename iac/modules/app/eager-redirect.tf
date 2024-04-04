@@ -1,7 +1,7 @@
 data "archive_file" "eager_redirect_func" {
   type        = "zip"
-  source_dir  = "./../edge-lambdas/eager-redirect"
-  output_path = "./../edge-lambdas/eager-redirect.zip"
+  source_dir  = "../../../edge-lambdas/eager-redirect"
+  output_path = "../../../edge-lambdas/eager-redirect.zip"
 }
 
 resource "aws_lambda_function" "eager_redirect_func" {
