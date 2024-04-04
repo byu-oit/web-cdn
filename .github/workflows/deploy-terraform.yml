@@ -33,7 +33,7 @@ jobs:
                 "extra_tags": "data-sensitivity=public repo=https://github.com/byu-oit/web-cdn",
                 "env" : "dev",
                 "root_dns" : "cdn-dev.byu.edu",
-                "config_branch": "dev",
+                "config_branch": "terraform",
                 "certificate_arn" : "arn:aws:acm:us-east-1:632558792265:certificate/1bc2f81c-2f79-46b3-9d3b-54ce672ba8be",
                 "assembler_ecr_repo_name" : "web-cdn-dev-assembler"
                 "tf_working_dir":"./iac/dev/app",
