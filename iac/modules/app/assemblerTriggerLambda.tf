@@ -26,47 +26,6 @@ resource "aws_iam_policy" "CdnBuildInvokerPolicy" {
   })
 }
 
-resource "aws_api_gateway_rest_api" "tweeter_api_gateway" {
-  name = "tweeter-api-gateway"
-  description = "tweeter-api-gateway"
-  endpoint_configuration {
-    types = ["REGIONAL"]
-  }
-}
-
-module "WebhookFunc" {
-  source       = "github.com/byu-oit/terraform-aws-lambda-api?ref=v3.0.1"
-  app_name     = "${var.cdn_name}-webhooks-${var.env}"
-  zip_filename = data.archive_file.WebhookFuncLambda.output_path
-  zip_handler  = "lambda.handler"
-  zip_runtime  = "nodejs14.x"
-
-  hosted_zone                   = module.acs.route53_zone
-  https_certificate_arn         = module.acs.certificate.arn
-  vpc_id                        = module.acs.vpc.id
-  public_subnet_ids             = module.acs.public_subnet_ids
-  role_permissions_boundary_arn = module.acs.role_permissions_boundary.arn
-  codedeploy_service_role_arn   = module.acs.power_builder_role.arn
-  timeout                       = 60
-  use_codedeploy                = false
-
-  environment_variables = {
-    CDN_BUILDER_NAME: '??'
-    CDN_MAIN_CONFIG_REPO: var.configuration_github_repo
-    CDN_MAIN_CONFIG_BRANCH: var.configuration_github_branch
-  }
-
-  lambda_policies = [
-    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-    aws_iam_policy.CdnBuildInvokerPolicy.arn
-  ]
-}
-
-resource "aws_lambda_event_source_mapping" "event_source_mapping" {
-  event_source_arn = aws_sqs_queue.queue.arn
-  function_name    = aws_lambda_function.queue.arn
-}
-
 resource "aws_lambda_function" "WebhookFunc" {
   filename                       = data.archive_file.WebhookFuncLambda.output_path
   function_name                  = "${var.cdn_name}-webhooks-${var.env}"
@@ -76,10 +35,51 @@ resource "aws_lambda_function" "WebhookFunc" {
   source_code_hash               = base64sha256(data.archive_file.WebhookFuncLambda.output_path)
   publish                        = true
   timeout                        = 60
+  memory_size                    = 128
 
   environment {
-    ECS_TASK_NAME: '??'
-    CDN_MAIN_CONFIG_REPO: var.configuration_github_repo
-    CDN_MAIN_CONFIG_BRANCH: var.configuration_github_branch
+    ECS_TASK_NAME: '??' # Will become a fargate task for building even though its a lambda rn
   }
 }
+
+# WebhookDomain
+resource "aws_api_gateway_rest_api" "WebHookDomain" {
+  name = "tweeter-api-gateway"
+  description = "CDN WebhookDomain API Gateway"
+}
+
+# TODO: change when we deploy to the real domain
+resource "aws_api_gateway_domain_name" "WebHookDomain" {
+  certificate_arn = module.acs.certificate.arn
+  domain_name     = "webhooks.${module.acs.route53_zone.name}"
+}
+
+resource "aws_api_gateway_resource" "proxy" {
+  rest_api_id = aws_api_gateway_rest_api.WebHookDomain.id
+  parent_id   = aws_api_gateway_rest_api.WebHookDomain.root_resource_id
+  path_part   = "{proxy+}"
+}
+
+resource "aws_api_gateway_integration" "lambda_integration" {
+  rest_api_id = aws_api_gateway_rest_api.WebHookDomain.id
+  resource_id = aws_api_gateway_resource.proxy.id
+  integration_http_method = "POST"
+  type = "AWS"
+  uri = aws_lambda_function.WebhookFunc.invoke_arn
+}
+
+resource "aws_api_gateway_deployment" "deployment" {
+  rest_api_id = aws_api_gateway_rest_api.WebHookDomain.id
+  stage_name = var.env
+  depends_on = [
+    aws_api_gateway_integration.lambda_integration,
+    aws_api_gateway_resource.proxy,
+  ]
+}
+
+resource "aws_api_gateway_stage" "stage" {
+  deployment_id = aws_api_gateway_deployment.deployment.id
+  rest_api_id   = aws_api_gateway_rest_api.WebHookDomain.id
+  stage_name    = var.env
+}
+
