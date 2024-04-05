@@ -10,6 +10,10 @@ variable "image_tag" {
   type = string
 }
 
+variable "force_destroy" {
+  type = bool
+}
+
 data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}

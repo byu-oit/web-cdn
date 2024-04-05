@@ -5,41 +5,53 @@ variable "s3_bucket_name" {
 
 # TODO possibly add allow CORS
 resource "aws_s3_bucket" "CdnContentBucket" {
-  bucket = "${var.cdn_name}-${var.env}-contents-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}"
+  bucket = "${var.cdn_name}-${var.env}-contents-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}-temp"
 }
 
 resource "aws_s3_bucket_public_access_block" "content_bucket" {
   bucket = aws_s3_bucket.CdnContentBucket.id
 
-  block_public_acls       = false
+  block_public_acls       = true
   block_public_policy     = false
-  ignore_public_acls      = false
+  ignore_public_acls      = true
   restrict_public_buckets = false
 }
 
 resource "aws_s3_bucket_ownership_controls" "content_bucket" {
   bucket = aws_s3_bucket.CdnContentBucket.id
   rule {
-    object_ownership = "BucketOwnerPreferred"
+    object_ownership = "BucketOwnerEnforced"
   }
 }
 
+resource "random_string" "cf_key" {
+  length  = 32
+  special = false
+}
 
-resource "aws_s3_bucket_policy" "bucket_policy" {
-  bucket = aws_s3_bucket.CdnContentBucket.id
+data "aws_iam_policy_document" "static_website" {
+  statement {
+    sid       = "1"
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.CdnContentBucket.arn}/*"]
 
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Sid       = "PublicReadGetObject",
-        Effect    = "Allow",
-        Principal = "*",
-        Action    = "s3:GetObject",
-        Resource  = "${aws_s3_bucket.CdnContentBucket.arn}/*"
-      }
-    ]
-  })
+    principals {
+      identifiers = ["*"]
+      type        = "AWS"
+    }
+
+    condition {
+      test     = "StringLike"
+      values   = [random_string.cf_key.result]
+      variable = "aws:Referer"
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "cdn_bucket_read" {
+  depends_on = [aws_s3_bucket_ownership_controls.content_bucket]
+  bucket     = aws_s3_bucket.CdnContentBucket.id
+  policy     = data.aws_iam_policy_document.static_website.json
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "content_bucket_config" {

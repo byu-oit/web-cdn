@@ -12,6 +12,7 @@ resource "aws_lambda_function" "eager_redirect_func" {
   memory_size   = 512
   timeout       = 20
   role          = aws_iam_role.EdgeLambdaExecutionRole.arn
+  publish       = true
 }
 
 

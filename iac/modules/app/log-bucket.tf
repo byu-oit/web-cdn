@@ -1,7 +1,8 @@
 
 # TODO possibly add allow CORS
 resource "aws_s3_bucket" "LogBucket" {
-  bucket = "${var.cdn_name}-${var.env}-logs-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}"
+  bucket = "${var.cdn_name}-${var.env}-logs-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}-temp"
+  force_destroy = var.force_destroy
 }
 
 resource "aws_s3_bucket_public_access_block" "log_bucket" {
@@ -14,7 +15,8 @@ resource "aws_s3_bucket_public_access_block" "log_bucket" {
 }
 
 resource "aws_s3_bucket_ownership_controls" "log_bucket" {
-  bucket = aws_s3_bucket.CdnContentBucket.id
+  depends_on = [aws_s3_bucket_public_access_block.log_bucket]
+  bucket     = aws_s3_bucket.LogBucket.id
   rule {
     object_ownership = "BucketOwnerPreferred"
   }
@@ -24,7 +26,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "log_bucket_config" {
   bucket = aws_s3_bucket.CdnContentBucket.id
 
   rule {
-    id = "ExpireUnprocessedLogs"
+    id     = "ExpireUnprocessedLogs"
     status = "Enabled"
     expiration {
       days = 60
@@ -35,7 +37,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "log_bucket_config" {
   }
 
   rule {
-    id = "UnprocessedLogsToInfrequentAccess"
+    id     = "UnprocessedLogsToInfrequentAccess"
     status = "Enabled"
     filter {
       prefix = local.unprocessed_log_prefix
@@ -47,7 +49,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "log_bucket_config" {
   }
 
   rule {
-    id = "ExpirePreprocessedLogs"
+    id     = "ExpirePreprocessedLogs"
     status = "Enabled"
     expiration {
       days = 10
@@ -56,5 +58,23 @@ resource "aws_s3_bucket_lifecycle_configuration" "log_bucket_config" {
       prefix = local.preprocessed_log_prefix
     }
   }
+}
 
+#resource "aws_s3_bucket_acl" "log_bucket" {
+#  depends_on = [
+#    aws_s3_bucket_ownership_controls.log_bucket,
+#    aws_s3_bucket_public_access_block.log_bucket,
+#  ]
+#
+#  bucket = aws_s3_bucket.CdnContentBucket.id
+#  acl    = "log"
+#}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "logging_encryption" {
+  bucket = aws_s3_bucket.LogBucket.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
 }

@@ -52,4 +52,5 @@ module "app" {
   default_ttl         = 30
   max_ttl             = 60
   min_ttl             = 0
+  force_destroy       = true
 }

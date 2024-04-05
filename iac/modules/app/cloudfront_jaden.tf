@@ -41,21 +41,31 @@ resource "aws_acm_certificate" "new_cert" {
   validation_method = "DNS"
 }
 resource "aws_acm_certificate_validation" "new_cert" {
-  certificate_arn         = aws_acm_certificate.new_cert[0].arn
+  certificate_arn         = aws_acm_certificate.new_cert.arn
   validation_record_fqdns = [for record in aws_route53_record.new_cert_validation : record.fqdn]
 }
 # ==================== Route53 ====================
 resource "aws_route53_record" "a_record" {
-  name            = "${var.cdn_name}-${var-env}"
+  name            = "${var.cdn_name}-${var.env}"
   type            = "A"
   zone_id         = local.root_dns_id
   allow_overwrite = false
+  alias {
+    name                   = aws_cloudfront_distribution.WebsiteCloudfront.domain_name
+    zone_id                = aws_cloudfront_distribution.WebsiteCloudfront.hosted_zone_id
+    evaluate_target_health = false
+  }
 }
 resource "aws_route53_record" "aaaa_record" {
-  name            = "${var.cdn_name}-${var-env}"
+  name            = "${var.cdn_name}-${var.env}"
   type            = "AAAA"
   zone_id         = local.root_dns_id
   allow_overwrite = false
+  alias {
+    name                   = aws_cloudfront_distribution.WebsiteCloudfront.domain_name
+    zone_id                = aws_cloudfront_distribution.WebsiteCloudfront.hosted_zone_id
+    evaluate_target_health = false
+  }
 }
 resource "aws_route53_record" "new_cert_validation" {
   for_each = {
@@ -154,7 +164,7 @@ resource "aws_cloudfront_distribution" "WebsiteCloudfront" {
 
   origin {
     origin_id   = "only-origin"
-    domain_name = aws_s3_bucket_website_configuration.CdnContentBucket.website_endpoint
+    domain_name = aws_s3_bucket.CdnContentBucket.bucket_domain_name
 
     s3_origin_config {
       origin_access_identity = ""

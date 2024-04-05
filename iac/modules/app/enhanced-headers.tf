@@ -12,4 +12,5 @@ resource "aws_lambda_function" "enhanced_headers_func" {
   memory_size   = 128
   timeout       = 20
   role          = aws_iam_role.EdgeLambdaExecutionRole.arn
+  publish       = true
 }
