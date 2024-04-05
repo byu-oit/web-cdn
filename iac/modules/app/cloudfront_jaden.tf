@@ -35,11 +35,16 @@ variable "min_ttl" {
   description = "Cloudfront cache min ttl"
 }
 
+# ==================== HTTPS cert ====================
 resource "aws_acm_certificate" "new_cert" {
-  domain_name       =  local.root_dns_name
+  domain_name       = "${var.cdn_name}.${local.root_dns_name}" # TODO double-check domain name
   validation_method = "DNS"
 }
-
+resource "aws_acm_certificate_validation" "new_cert" {
+  certificate_arn         = aws_acm_certificate.new_cert[0].arn
+  validation_record_fqdns = [for record in aws_route53_record.new_cert_validation : record.fqdn]
+}
+# ==================== Route53 ====================
 resource "aws_route53_record" "a_record" {
   name            = "${var.cdn_name}-${var-env}"
   type            = "A"
@@ -52,7 +57,6 @@ resource "aws_route53_record" "aaaa_record" {
   zone_id         = local.root_dns_id
   allow_overwrite = false
 }
-
 resource "aws_route53_record" "new_cert_validation" {
   for_each = {
     for dvo in aws_acm_certificate.new_cert.domain_validation_options : dvo.domain_name => {
@@ -68,18 +72,12 @@ resource "aws_route53_record" "new_cert_validation" {
   records = [each.value.record]
   ttl     = 60
 }
-
-data "aws_route53_record" "existing_record" {
-  zone_id = local.root_dns_id
-  name    = "_3c077e2b2d1354f739d9880494eaec9b.byu-oit-fullstack-trn.amazon.byu.edu"
-  type    = "CNAME"
-}
-
-resource "aws_acm_certificate_validation" "new_cert" {
-  certificate_arn         = aws_acm_certificate.new_cert.arn
-  validation_record_fqdns = [for record in aws_route53_record.new_cert_validation : record.fqdn]
-}
-
+#
+# data "aws_route53_record" "existing_record" {
+#   zone_id = local.root_dns_id
+#   name    = "_3c077e2b2d1354f739d9880494eaec9b.byu-oit-fullstack-trn.amazon.byu.edu"
+#   type    = "CNAME"
+# }
 
 resource "aws_cloudfront_distribution" "WebsiteCloudfront" {
   comment = "${local.root_dns_name} - ${var.cdn_name} ${var.env}"
