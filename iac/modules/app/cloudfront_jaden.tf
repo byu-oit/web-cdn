@@ -119,12 +119,12 @@ resource "aws_cloudfront_distribution" "WebsiteCloudfront" {
 
     lambda_function_association {
       event_type = "origin-request"
-      lambda_arn = aws_lambda_function.eager_redirect_func.arn
+      lambda_arn = aws_lambda_function.eager_redirect_func.qualified_arn
     }
 
     lambda_function_association {
       event_type = "origin-response"
-      lambda_arn = aws_lambda_function.enhanced_headers_func.arn
+      lambda_arn = aws_lambda_function.enhanced_headers_func.qualified_arn
     }
   }
 
