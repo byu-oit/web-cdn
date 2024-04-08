@@ -5,12 +5,13 @@ data "archive_file" "enhanced_header_func" {
 }
 
 resource "aws_lambda_function" "enhanced_headers_func" {
-  function_name = "${var.cdn_name}-edge-enhanced-headers-${var.env}"
-  filename      = data.archive_file.enhanced_header_func.output_path
-  handler       = "index.handler"
-  runtime       = "nodejs16.x"
-  memory_size   = 128
-  timeout       = 20
-  role          = aws_iam_role.EdgeLambdaExecutionRole.arn
-  publish       = true
+  function_name    = "${var.cdn_name}-edge-enhanced-headers-${var.env}"
+  filename         = data.archive_file.enhanced_header_func.output_path
+  handler          = "index.handler"
+  runtime          = "nodejs16.x"
+  memory_size      = 128
+  timeout          = 20
+  role             = aws_iam_role.EdgeLambdaExecutionRole.arn
+  publish          = true
+  source_code_hash = data.archive_file.enhanced_header_func.output_base64sha256 # forces terraform to push the zip files when they change
 }
