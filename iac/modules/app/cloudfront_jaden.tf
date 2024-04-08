@@ -37,8 +37,8 @@ variable "min_ttl" {
 
 # ==================== HTTPS cert ====================
 resource "aws_acm_certificate" "new_cert" {
-  domain_name       = "${var.cdn_name}.${local.root_dns_name}" # TODO double-check domain name
-  validation_method = "DNS"
+  domain_name               = "${var.cdn_name}.${local.root_dns_name}" # TODO double-check domain name
+  validation_method         = "DNS"
   subject_alternative_names = ["*.${var.cdn_name}.${local.root_dns_name}"]
 }
 resource "aws_acm_certificate_validation" "new_cert" {
@@ -78,11 +78,11 @@ resource "aws_route53_record" "new_cert_validation" {
   }
 
   allow_overwrite = true
-  name    = each.value.name
-  type    = each.value.type
-  zone_id  = local.root_dns_id
-  records = [each.value.record]
-  ttl     = 60
+  name            = each.value.name
+  type            = each.value.type
+  zone_id         = local.root_dns_id
+  records         = [each.value.record]
+  ttl             = 60
 }
 #
 # data "aws_route53_record" "existing_record" {
@@ -92,8 +92,8 @@ resource "aws_route53_record" "new_cert_validation" {
 # }
 
 resource "aws_cloudfront_distribution" "WebsiteCloudfront" {
-  comment = "${local.root_dns_name} - ${var.cdn_name} ${var.env}"
-  aliases = ["${var.cdn_name}.${local.root_dns_name}", "*.${var.cdn_name}.${local.root_dns_name}"]
+  comment      = "${local.root_dns_name} - ${var.cdn_name} ${var.env}"
+  aliases      = ["${var.cdn_name}.${local.root_dns_name}", "*.${var.cdn_name}.${local.root_dns_name}"]
   enabled      = true
   http_version = "http2"
 
@@ -104,9 +104,9 @@ resource "aws_cloudfront_distribution" "WebsiteCloudfront" {
   }
 
   default_cache_behavior {
-    allowed_methods        = ["GET", "HEAD", "OPTIONS"]
-    cached_methods         = ["GET", "HEAD", "OPTIONS"]
-    compress               = true
+    allowed_methods = ["GET", "HEAD", "OPTIONS"]
+    cached_methods  = ["GET", "HEAD", "OPTIONS"]
+    compress        = true
     forwarded_values {
       query_string = false
       cookies {
@@ -115,9 +115,9 @@ resource "aws_cloudfront_distribution" "WebsiteCloudfront" {
     }
     target_origin_id       = "only-origin"
     viewer_protocol_policy = "redirect-to-https"
-    default_ttl      = var.default_ttl
-    max_ttl          = var.max_ttl
-    min_ttl          = var.min_ttl
+    default_ttl            = var.default_ttl
+    max_ttl                = var.max_ttl
+    min_ttl                = var.min_ttl
 
     lambda_function_association {
       event_type = "origin-request"
@@ -131,10 +131,10 @@ resource "aws_cloudfront_distribution" "WebsiteCloudfront" {
   }
 
   ordered_cache_behavior {
-    path_pattern = "/.cdn-infra/*"
+    path_pattern    = "/.cdn-infra/*"
     allowed_methods = ["GET", "HEAD", "OPTIONS"]
-    cached_methods = ["GET", "HEAD", "OPTIONS"]
-    compress = true
+    cached_methods  = ["GET", "HEAD", "OPTIONS"]
+    compress        = true
     forwarded_values {
       query_string = false
       cookies {
@@ -142,11 +142,11 @@ resource "aws_cloudfront_distribution" "WebsiteCloudfront" {
       }
     }
 
-    target_origin_id = "only-origin"
+    target_origin_id       = "only-origin"
     viewer_protocol_policy = "redirect-to-https"
-    default_ttl      = var.default_ttl
-    max_ttl          = var.max_ttl
-    min_ttl          = var.min_ttl
+    default_ttl            = var.default_ttl
+    max_ttl                = var.max_ttl
+    min_ttl                = var.min_ttl
 
     lambda_function_association {
       event_type   = "origin-response"
@@ -155,10 +155,10 @@ resource "aws_cloudfront_distribution" "WebsiteCloudfront" {
     }
   }
 
-    logging_config {
-      bucket = aws_s3_bucket.LogBucket.bucket_domain_name
-      prefix = local.unprocessed_log_prefix
-    }
+  logging_config {
+    bucket = aws_s3_bucket.LogBucket.bucket_domain_name
+    prefix = local.unprocessed_log_prefix
+  }
 
   default_root_object = "index.html" # TODO: abstract to variables?
   price_class         = "PriceClass_100"
@@ -173,13 +173,13 @@ resource "aws_cloudfront_distribution" "WebsiteCloudfront" {
     }
 
     # TODO: why is this commented in the cloudbuild spec???
-#    domain_name = aws_s3_bucket_website_configuration.CdnContentBucket.website_endpoint
-#    custom_origin_config {
-#      http_port              = "80"
-#      https_port             = "443"
-#      origin_protocol_policy = "http-only"
-#      origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
-#    }
+    #    domain_name = aws_s3_bucket_website_configuration.CdnContentBucket.website_endpoint
+    #    custom_origin_config {
+    #      http_port              = "80"
+    #      https_port             = "443"
+    #      origin_protocol_policy = "http-only"
+    #      origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
+    #    }
   }
 
   restrictions {

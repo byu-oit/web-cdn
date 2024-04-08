@@ -1,7 +1,7 @@
 
 # TODO possibly add allow CORS
 resource "aws_s3_bucket" "LogBucket" {
-  bucket = "${var.cdn_name}-${var.env}-logs-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}-temp"
+  bucket        = "${var.cdn_name}-${var.env}-logs-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}-temp"
   force_destroy = var.force_destroy
 }
 

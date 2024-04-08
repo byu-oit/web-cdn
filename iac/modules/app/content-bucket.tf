@@ -22,7 +22,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "content_bucket_config" {
   bucket = aws_s3_bucket.CdnContentBucket.id
 
   rule {
-    id = "ExpireOldVersions"
+    id     = "ExpireOldVersions"
     status = "Enabled"
     noncurrent_version_expiration {
       noncurrent_days = 180
@@ -30,7 +30,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "content_bucket_config" {
   }
 
   rule {
-    id = "RemoveOldBlobs"
+    id     = "RemoveOldBlobs"
     status = "Enabled"
     filter {
       prefix = ".cdn-infra/file-blobs/"
@@ -95,7 +95,7 @@ resource "aws_s3_bucket_public_access_block" "content_bucket" {
 
 resource "aws_s3_bucket_ownership_controls" "content_bucket" {
   depends_on = [aws_s3_bucket_public_access_block.content_bucket]
-  bucket = aws_s3_bucket.CdnContentBucket.id
+  bucket     = aws_s3_bucket.CdnContentBucket.id
   rule {
     object_ownership = "BucketOwnerEnforced"
   }

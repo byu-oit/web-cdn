@@ -119,7 +119,7 @@ resource "aws_iam_role_policy_attachment" "AllowAssemblerImageAccessAttachment" 
 }
 
 data "aws_iam_policy_document" "ecs_invokation_policy" {
-  version     = "2012-10-17"
+  version = "2012-10-17"
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
