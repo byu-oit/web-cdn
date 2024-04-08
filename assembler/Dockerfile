@@ -4,9 +4,7 @@ FROM public.ecr.aws/docker/library/node:18-alpine
 RUN apk --no-cache add python3 git
 
 ## Install AWS CLI
-RUN apk --no-cache add py3-pip && \
-    pip install awscli && \
-    apk --no-cache del py3-pip
+RUN apk --no-cache add aws-cli
 
 ENV ASSEMBLER_HOME=/usr/src/assembler/
 

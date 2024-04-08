@@ -8,8 +8,8 @@ on:
       - README.md
 concurrency: ${{ github.ref }}
 env:
-  tf_version: "1.1.7" # must match value in terraform-iac/*/app/main.tf
-  node_version: "14.x"
+  tf_version: "1.4.5" # must match value in terraform-iac/*/app/main.tf
+  node_version: "16.x"
 
 jobs:
   env:
@@ -35,13 +35,14 @@ jobs:
                 "root_dns" : "cdn-dev.byu.edu",
                 "config_branch": "terraform",
                 "certificate_arn" : "arn:aws:acm:us-east-1:632558792265:certificate/1bc2f81c-2f79-46b3-9d3b-54ce672ba8be",
-                "assembler_ecr_repo_name" : "web-cdn-dev-assembler",
+                "assembler_ecr_repo_name" : "cdn-terraform-assembler",
                 "tf_working_dir":"./iac/dev/app"
               }
             ]
           }'
           echo matrix=`echo $matrix | jq -c .` >> $GITHUB_ENV
 
+      # TODO: Update for prd
       - name: Set up PRD Environment Variables
         if: github.ref == 'refs/heads/master'
         run: |
@@ -114,12 +115,12 @@ jobs:
           root_dns: ${{ matrix.env.root_dns }}
         run: echo $root_dns
 
-      - name: Lerna Exec
-        env:
-          ENV: ${{ matrix.env.env }}
-          AWS_ACCOUNT_ID: ${{ steps.awscreds.outputs.aws-account-id }}
-          ROOT_DNS: ${{ matrix.env.root_dns }}
-        run: lerna exec -- ./codebuild.sh
+      #      - name: Lerna Exec
+      #        env:
+      #          ENV: ${{ matrix.env.env }}
+      #          AWS_ACCOUNT_ID: ${{ steps.awscreds.outputs.aws-account-id }}
+      #          ROOT_DNS: ${{ matrix.env.root_dns }}
+      #        run: lerna exec -- ./codebuild.sh
 
       - name: find
         run: find ./* -mtime +10950 -exec touch {} \;
@@ -164,7 +165,7 @@ jobs:
 
       - name: Terraform Plan
         working-directory: ${{ matrix.env.tf_working_dir }}
-        run: terraform plan -var 'image_tag=${{ steps.date.outputs.timestamp }}' -var 'zip_name=test-hydra-${{ steps.date.outputs.timestamp }}.zip' -input=false -out=plan
+        run: terraform plan -var 'image_tag=${{ steps.date.outputs.timestamp }}' -input=false -out=plan
 
       - name: Analyze Terraform Plan
         uses: byu-oit/github-action-tf-plan-analyzer@v2
@@ -186,17 +187,17 @@ jobs:
         working-directory: ${{ matrix.env.tf_working_dir }}
         run: terraform apply plan
 
-#      - name: deploy
-#        env:
-#          cdn_name: ${{ matrix.env.cdn_name }}
-#          env: ${{ matrix.env.env }}
-#          root_dns: ${{ matrix.env.root_dns }}
-#          account_stack_name: ${{ matrix.env.account_stack_name }}
-#          certificate_arn: ${{ matrix.env.certificate_arn }}
-#          config_repo: ${{ matrix.env.config_repo }}
-#          config_branch: ${{ matrix.env.config_branch }}
-#          extra_tags: ${{ matrix.env.extra_tags }}
-#        run: .aws-infrastructure/deploy-environment.sh $cdn_name $env $root_dns $account_stack_name $certificate_arn $config_repo $config_branch "$extra_tags"
+      #      - name: deploy
+      #        env:
+      #          cdn_name: ${{ matrix.env.cdn_name }}
+      #          env: ${{ matrix.env.env }}
+      #          root_dns: ${{ matrix.env.root_dns }}
+      #          account_stack_name: ${{ matrix.env.account_stack_name }}
+      #          certificate_arn: ${{ matrix.env.certificate_arn }}
+      #          config_repo: ${{ matrix.env.config_repo }}
+      #          config_branch: ${{ matrix.env.config_branch }}
+      #          extra_tags: ${{ matrix.env.extra_tags }}
+      #        run: .aws-infrastructure/deploy-environment.sh $cdn_name $env $root_dns $account_stack_name $certificate_arn $config_repo $config_branch "$extra_tags"
 
       - name: End Standard Change
         uses: byu-oit/github-action-end-standard-change@v1
