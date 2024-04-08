@@ -39,6 +39,7 @@ variable "min_ttl" {
 resource "aws_acm_certificate" "new_cert" {
   domain_name       = "${var.cdn_name}.${local.root_dns_name}" # TODO double-check domain name
   validation_method = "DNS"
+  subject_alternative_names = ["*.${var.cdn_name}.${local.root_dns_name}"]
 }
 resource "aws_acm_certificate_validation" "new_cert" {
   certificate_arn         = aws_acm_certificate.new_cert.arn
@@ -76,6 +77,7 @@ resource "aws_route53_record" "new_cert_validation" {
     }
   }
 
+  allow_overwrite = true
   name    = each.value.name
   type    = each.value.type
   zone_id  = local.root_dns_id
@@ -91,7 +93,7 @@ resource "aws_route53_record" "new_cert_validation" {
 
 resource "aws_cloudfront_distribution" "WebsiteCloudfront" {
   comment = "${local.root_dns_name} - ${var.cdn_name} ${var.env}"
-  aliases = [local.root_dns_name]
+  aliases = ["${var.cdn_name}.${local.root_dns_name}", "*.${var.cdn_name}.${local.root_dns_name}"]
   enabled      = true
   http_version = "http2"
 

@@ -21,3 +21,5 @@ dist/
 lerna-*.log
 
 .terraform
+
+*.zip
