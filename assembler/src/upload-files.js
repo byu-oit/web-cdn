@@ -145,6 +145,7 @@ async function copyFilesToDestination(bucket, files) {
         } catch (e) {
             console.error('error copying', config.CopySource, 'to', config.Key);
             console.error(e)
+            console.error('config:', config)
             throw e;
         }
 
