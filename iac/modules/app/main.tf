@@ -82,7 +82,7 @@ resource "aws_iam_policy" "CdnContentBucketAllowBuilderUpdates" {
 }
 
 resource "aws_iam_policy" "CdnContentBucketAllowBuilderUpdatesOnObjects" {
-  name        = "CdnContentBucketAllowBuilderUpdates"
+  name        = "CdnContentBucketAllowBuilderUpdatesOnObjects"
   description = "Allows S3 Object Access From Assembler"
   policy = jsonencode({
     "Version" : "2012-10-17",
