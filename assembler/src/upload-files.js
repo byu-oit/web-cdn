@@ -144,6 +144,7 @@ async function copyFilesToDestination(bucket, files) {
             await s3Client.copyObject(config).promise();
         } catch (e) {
             console.error('error copying', config.CopySource, 'to', config.Key);
+            console.error(e)
             throw e;
         }
 
@@ -176,7 +177,7 @@ async function copyFilesToDestination(bucket, files) {
 async function invalidateInfraFiles(files, cdnHost, dryRun) {
     const paths = files.filter(it => it.invalidate)
         .map(it => it.cdnPath);
-    
+
     if (dryRun) {
         log.debug('Dry run; would have invalidated', paths);
         return;
