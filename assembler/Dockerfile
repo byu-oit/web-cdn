@@ -23,4 +23,4 @@ ADD . ./
 
 RUN chmod a+x bin/cdn-assembler.js && yarn link
 
-CMD ["bin/cdn-assembler", "--config", "main-config.yml"]
+CMD ["bin/cdn-assembler", "--config", "main-config.yml", "--verbose"]
