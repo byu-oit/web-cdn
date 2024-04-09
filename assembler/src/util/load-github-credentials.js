@@ -35,7 +35,7 @@ module.exports = async function loadGithubCredentials(env) {
     if (local) {
         return local;
     }
-    return await fromParameterStore(env);
+    return fromEnvironment()
 };
 
 async function fromLocalFile() {
@@ -52,6 +52,10 @@ async function fromLocalFile() {
     if (location) {
         return await fs.readJson(location);
     }
+}
+
+function fromEnvironment() {
+  return {user: process.env.GITHUB_USER, token: process.env.GITHUB_TOKEN};
 }
 
 async function fromParameterStore(env) {
