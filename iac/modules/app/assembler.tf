@@ -21,10 +21,8 @@ module "assembler" {
 
     task_policies = [
       "arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess",
-      #      "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
-      #      aws_iam_policy.AllowCdnParameterStoreAccess.arn,
+      aws_iam_policy.AllowCdnParameterStoreAccess.arn,
       aws_iam_policy.AllowCloudFrontInvalidation.arn,
-      #      aws_iam_policy.AllowAssemblerImageAccess.arn
     ]
   }
 
