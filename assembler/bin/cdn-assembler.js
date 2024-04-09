@@ -73,7 +73,7 @@ const args = require('yargs')
     .default('env', process.env.BUILD_ENV)
     .boolean('dry-run')
     .boolean('force-build')
-    .demandOption(['config', 'bucket', 'cdn-host'], 'You must specify all of: config, bucket, and cdn-host')
+    .demandOption(['config'], 'You must specify all of: config')
     .env("CDN")
     .help()
 
