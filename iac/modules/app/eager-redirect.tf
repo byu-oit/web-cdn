@@ -14,8 +14,11 @@ resource "aws_lambda_function" "eager_redirect_func" {
   role             = aws_iam_role.EdgeLambdaExecutionRole.arn
   publish          = true
   source_code_hash = data.archive_file.eager_redirect_func.output_base64sha256 # forces terraform to push the zip files when they change
-
 }
 
+# ==================== CloudWatch ====================
 
-
+resource "aws_cloudwatch_log_group" "eager_redirect_log_group" {
+  name              = "/aws/lambda/${aws_lambda_function.eager_redirect_func.function_name}"
+  retention_in_days = 14
+}

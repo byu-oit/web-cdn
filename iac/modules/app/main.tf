@@ -174,7 +174,12 @@ resource "aws_iam_role" "EdgeLambdaExecutionRole" {
       }
     ]
   })
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-  ]
+#  managed_policy_arns = [ # NOTE: this was replaced by the policy attachment below, may/may not be necessary
+#    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+#  ]
+}
+
+resource "aws_iam_role_policy_attachment" "enhanced_headers_lambda_cloudwatch_attach" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  role       = aws_iam_role.EdgeLambdaExecutionRole.name
 }
