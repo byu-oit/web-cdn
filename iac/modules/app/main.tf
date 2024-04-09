@@ -81,8 +81,8 @@ resource "aws_iam_policy" "CdnContentBucketAllowBuilderUpdates" {
   })
 }
 
-resource "aws_iam_policy" "CdnContentBucketAllowBuilderUpdatesOnObjects" {
-  name        = "CdnContentBucketAllowBuilderUpdatesOnObjects"
+resource "aws_iam_policy" "S3ObjectAccess" {
+  name        = "S3ObjectAccess"
   description = "Allows S3 Object Access From Assembler"
   policy = jsonencode({
     "Version" : "2012-10-17",
@@ -127,26 +127,31 @@ resource "aws_iam_policy" "AllowAssemblerImageAccess" {
 }
 
 resource "aws_iam_role_policy_attachment" "AllowCdnParameterStoreAccessAttachment" {
+  depends_on = [aws_iam_policy.AllowCdnParameterStoreAccess, aws_iam_role.CdnBuilderRole]
   role       = aws_iam_role.CdnBuilderRole.name
   policy_arn = aws_iam_policy.AllowCdnParameterStoreAccess.arn
 }
 
 resource "aws_iam_role_policy_attachment" "AllowCloudFrontInvalidationAttachment" {
+  depends_on = [aws_iam_policy.AllowCloudFrontInvalidation, aws_iam_role.CdnBuilderRole]
   role       = aws_iam_role.CdnBuilderRole.name
   policy_arn = aws_iam_policy.AllowCloudFrontInvalidation.arn
 }
 
 resource "aws_iam_role_policy_attachment" "AllowAssemblerImageAccessAttachment" {
+  depends_on = [aws_iam_policy.AllowAssemblerImageAccess, aws_iam_role.CdnBuilderRole]
   role       = aws_iam_role.CdnBuilderRole.name
   policy_arn = aws_iam_policy.AllowAssemblerImageAccess.arn
 }
 
-resource "aws_iam_role_policy_attachment" "CdnContentBucketAllowBuilderUpdatesOnObjects" {
+resource "aws_iam_role_policy_attachment" "S3ObjectAccess" {
+  depends_on = [aws_iam_policy.S3ObjectAccess, aws_iam_role.CdnBuilderRole]
   role       = aws_iam_role.CdnBuilderRole.name
-  policy_arn = aws_iam_policy.CdnContentBucketAllowBuilderUpdatesOnObjects.arn
+  policy_arn = aws_iam_policy.S3ObjectAccess.arn
 }
 
 resource "aws_iam_role_policy_attachment" "CdnContentBucketAllowBuilderUpdates" {
+  depends_on = [aws_iam_policy.CdnContentBucketAllowBuilderUpdates, aws_iam_role.CdnBuilderRole]
   role       = aws_iam_role.CdnBuilderRole.name
   policy_arn = aws_iam_policy.CdnContentBucketAllowBuilderUpdates.arn
 }
