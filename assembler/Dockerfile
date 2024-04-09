@@ -24,3 +24,5 @@ RUN chmod a+x bin/cdn-assembler.js && yarn link
 RUN mkdir -p /usr/src/app
 
 WORKDIR /usr/src/app
+
+CMD ["/app/cdn-assembler", "--config", "main-config.yml"]

@@ -39,10 +39,12 @@ const args = require('yargs')
     .option('bucket', {
         alias: 'b',
         describe: 'target bucket',
+        default: process.env.DESTINATION_S3_BUCKET
     })
     .option('cdn-host', {
         alias: 'h',
-        describe: 'CDN Hosting Hostname'
+        describe: 'CDN Hosting Hostname',
+        default: process.env.CDN_HOST
     })
     .option('github-credentials', {
         describe: 'path to JSON file containing Github credentials, like {"user": "abc", "token": "def"}'
@@ -68,6 +70,7 @@ const args = require('yargs')
     .alias('verbose', 'v')
     .boolean('verbose')
     .default('work-dir', '.tmp')
+    .default('env', process.env.BUILD_ENV)
     .boolean('dry-run')
     .boolean('force-build')
     .demandOption(['config', 'bucket', 'cdn-host'], 'You must specify all of: config, bucket, and cdn-host')
