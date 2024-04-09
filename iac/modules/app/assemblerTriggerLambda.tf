@@ -46,6 +46,7 @@ resource "aws_api_gateway_rest_api" "WebHookDomain" {
 resource "aws_api_gateway_domain_name" "WebHookDomain" {
   certificate_arn = module.acs.certificate_virginia.arn
   domain_name     = "webhooks.${local.root_dns_name}"
+  security_policy = "TLS_1_0"
 }
 
 resource "aws_api_gateway_resource" "proxy" {
@@ -66,7 +67,7 @@ resource "aws_api_gateway_integration" "lambda_integration" {
   resource_id             = aws_api_gateway_resource.proxy.id
   integration_http_method = "POST"
   http_method             = aws_api_gateway_method.proxy_method.http_method
-  type                    = "AWS"
+  type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.WebhookFunc.invoke_arn
 }
 
@@ -77,4 +78,33 @@ resource "aws_api_gateway_deployment" "deployment" {
     aws_api_gateway_integration.lambda_integration,
     aws_api_gateway_resource.proxy,
   ]
+}
+
+resource "aws_route53_record" "webhooks_a_record" {
+  name            = "webhooks.${var.cdn_name}-${var.env}"
+  type            = "A"
+  zone_id         = local.root_dns_id
+  allow_overwrite = false
+  alias {
+    name                   = aws_api_gateway_domain_name.WebHookDomain.cloudfront_domain_name
+    zone_id                = aws_api_gateway_domain_name.WebHookDomain.cloudfront_zone_id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "webhooks_aaaa_record" {
+  name            = "webhooks.${var.cdn_name}-${var.env}"
+  type            = "AAAA"
+  zone_id         = local.root_dns_id
+  allow_overwrite = false
+  alias {
+    name                   = aws_api_gateway_domain_name.WebHookDomain.cloudfront_domain_name
+    zone_id                = aws_api_gateway_domain_name.WebHookDomain.cloudfront_zone_id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_api_gateway_base_path_mapping" "base_path_mapping" {
+  api_id      = aws_api_gateway_rest_api.WebHookDomain.id
+  domain_name = aws_api_gateway_domain_name.WebHookDomain.domain_name
 }

@@ -68,18 +68,28 @@ resource "random_string" "cf_key" {
 data "aws_iam_policy_document" "static_website" {
   statement {
     sid       = "1"
-    actions   = ["s3:GetObject"]
-    resources = ["${aws_s3_bucket.CdnContentBucket.arn}/*"]
+    actions   = ["s3:ListBucket", "s3:PutBucketWebsite", "s3:Get*"]
+    resources = [aws_s3_bucket.CdnContentBucket.arn]
 
     principals {
       identifiers = ["*"]
       type        = "AWS"
     }
 
-    condition {
-      test     = "StringLike"
-      values   = [random_string.cf_key.result]
-      variable = "aws:Referer"
+    #    condition {
+    #      test     = "StringLike"
+    #      values   = [random_string.cf_key.result]
+    #      variable = "aws:Referer"
+    #    }
+  }
+  statement {
+    sid       = "2"
+    actions   = ["s3:*"]
+    resources = ["${aws_s3_bucket.CdnContentBucket.arn}/*"]
+
+    principals {
+      identifiers = ["*"]
+      type        = "AWS"
     }
   }
 }
@@ -87,9 +97,9 @@ data "aws_iam_policy_document" "static_website" {
 resource "aws_s3_bucket_public_access_block" "content_bucket" {
   bucket = aws_s3_bucket.CdnContentBucket.id
 
-  block_public_acls       = true
+  block_public_acls       = false
   block_public_policy     = false
-  ignore_public_acls      = true
+  ignore_public_acls      = false
   restrict_public_buckets = false
 }
 
@@ -97,7 +107,7 @@ resource "aws_s3_bucket_ownership_controls" "content_bucket" {
   depends_on = [aws_s3_bucket_public_access_block.content_bucket]
   bucket     = aws_s3_bucket.CdnContentBucket.id
   rule {
-    object_ownership = "BucketOwnerEnforced"
+    object_ownership = "ObjectWriter"
   }
 }
 
@@ -107,12 +117,19 @@ resource "aws_s3_bucket_policy" "cdn_bucket_read" {
   policy     = data.aws_iam_policy_document.static_website.json
 }
 
-#resource "aws_s3_bucket_acl" "content_bucket" {
-#  depends_on = [
-#    aws_s3_bucket_ownership_controls.content_bucket,
-##    aws_s3_bucket_public_access_block.content_bucket,
-#  ]
-#
-#  bucket = aws_s3_bucket.CdnContentBucket.id
-#  acl    = "public-read"
-#}
+resource "aws_s3_bucket_acl" "content_bucket" {
+  depends_on = [
+    aws_s3_bucket_ownership_controls.content_bucket,
+    #    aws_s3_bucket_public_access_block.content_bucket,
+  ]
+
+  bucket = aws_s3_bucket.CdnContentBucket.id
+  acl    = "public-read"
+}
+
+resource "aws_s3_bucket_versioning" "bucket_versioning" {
+  bucket = aws_s3_bucket.CdnContentBucket.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
