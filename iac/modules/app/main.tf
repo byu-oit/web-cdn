@@ -2,19 +2,6 @@ module "acs" {
   source = "github.com/byu-oit/terraform-aws-acs-info?ref=v3.5.0"
 }
 
-## AccountBucket
-#resource "aws_s3_bucket" "AccountBucket" {
-#  bucket = "${var.cdn_name}-infra-and-logs-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}"
-#}
-#
-#resource "aws_s3_bucket_public_access_block" "default" {
-#  bucket                  = aws_s3_bucket.AccountBucket.id
-#  block_public_acls       = true
-#  block_public_policy     = true
-#  ignore_public_acls      = true
-#  restrict_public_buckets = true
-#}
-
 # CdnBuilderRole
 resource "aws_iam_role" "CdnBuilderRole" {
   name = "CdnBuilderRole"
@@ -75,6 +62,42 @@ resource "aws_iam_policy" "AllowCloudFrontInvalidation" {
   })
 }
 
+resource "aws_iam_policy" "CdnContentBucketAllowBuilderUpdates" {
+  name        = "CdnContentBucketAllowBuilderUpdates"
+  description = "Allows S3 Access From Assembler"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:ListBucket",
+          "s3:PutBucketWebsite",
+          "s3:Get*"
+        ],
+        "Resource" : "arn:aws:s3:::${aws_s3_bucket.CdnContentBucket.id}"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "CdnContentBucketAllowBuilderUpdatesOnObjects" {
+  name        = "CdnContentBucketAllowBuilderUpdates"
+  description = "Allows S3 Object Access From Assembler"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:*",
+        ],
+        "Resource" : "arn:aws:s3:::${aws_s3_bucket.CdnContentBucket.id}/*"
+      }
+    ]
+  })
+}
+
 data "aws_ecr_repository" "assembler_ecr_repo" {
   name = "${var.cdn_name}-assembler"
 }
@@ -116,6 +139,16 @@ resource "aws_iam_role_policy_attachment" "AllowCloudFrontInvalidationAttachment
 resource "aws_iam_role_policy_attachment" "AllowAssemblerImageAccessAttachment" {
   role       = aws_iam_role.CdnBuilderRole.name
   policy_arn = aws_iam_policy.AllowAssemblerImageAccess.arn
+}
+
+resource "aws_iam_role_policy_attachment" "CdnContentBucketAllowBuilderUpdatesOnObjects" {
+  role       = aws_iam_role.CdnBuilderRole.name
+  policy_arn = aws_iam_policy.CdnContentBucketAllowBuilderUpdatesOnObjects.arn
+}
+
+resource "aws_iam_role_policy_attachment" "CdnContentBucketAllowBuilderUpdates" {
+  role       = aws_iam_role.CdnBuilderRole.name
+  policy_arn = aws_iam_policy.CdnContentBucketAllowBuilderUpdates.arn
 }
 
 data "aws_iam_policy_document" "ecs_invokation_policy" {
