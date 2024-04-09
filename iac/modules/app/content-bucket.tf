@@ -97,9 +97,9 @@ data "aws_iam_policy_document" "static_website" {
 resource "aws_s3_bucket_public_access_block" "content_bucket" {
   bucket = aws_s3_bucket.CdnContentBucket.id
 
-  block_public_acls       = false
+  block_public_acls       = true
   block_public_policy     = false
-  ignore_public_acls      = false
+  ignore_public_acls      = true
   restrict_public_buckets = false
 }
 
@@ -107,7 +107,7 @@ resource "aws_s3_bucket_ownership_controls" "content_bucket" {
   depends_on = [aws_s3_bucket_public_access_block.content_bucket]
   bucket     = aws_s3_bucket.CdnContentBucket.id
   rule {
-    object_ownership = "ObjectWriter"
+    object_ownership = "BucketOwnerPreferred"
   }
 }
 
@@ -117,15 +117,15 @@ resource "aws_s3_bucket_policy" "cdn_bucket_read" {
   policy     = data.aws_iam_policy_document.static_website.json
 }
 
-resource "aws_s3_bucket_acl" "content_bucket" {
-  depends_on = [
-    aws_s3_bucket_ownership_controls.content_bucket,
-    #    aws_s3_bucket_public_access_block.content_bucket,
-  ]
-
-  bucket = aws_s3_bucket.CdnContentBucket.id
-  acl    = "public-read"
-}
+#resource "aws_s3_bucket_acl" "content_bucket" {
+#  depends_on = [
+#    aws_s3_bucket_ownership_controls.content_bucket,
+#    #    aws_s3_bucket_public_access_block.content_bucket,
+#  ]
+#
+#  bucket = aws_s3_bucket.CdnContentBucket.id
+#  acl    = "public-read"
+#}
 
 resource "aws_s3_bucket_versioning" "bucket_versioning" {
   bucket = aws_s3_bucket.CdnContentBucket.id

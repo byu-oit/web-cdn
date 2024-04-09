@@ -94,7 +94,7 @@ resource "aws_route53_record" "aaaa_record" {
 
 resource "aws_cloudfront_distribution" "WebsiteCloudfront" {
   comment      = "${local.root_dns_name} - ${var.cdn_name} ${var.env}"
-  aliases      = ["${var.cdn_name}.${local.root_dns_name}"]
+  aliases      = ["${var.cdn_name}-${var.env}.${local.root_dns_name}"]
   enabled      = true
   http_version = "http2"
 
