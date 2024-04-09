@@ -9,10 +9,16 @@ module "assembler" {
     task_cpu    = 4096
     task_memory = 8192
     environment_variables = { # TODO: Fill in missing refs
-      "DESTINATION_S3_BUCKET" = "",
+      "DESTINATION_S3_BUCKET" = aws_s3_bucket_website_configuration.CdnContentBucket.id,
       "BUILD_ENV"             = var.env,
-      "CDN_HOST"              = "",
+      "CDN_HOST"              = "${var.cdn_name}-${var.env}.${local.root_dns_name}",
     }
+
+    secrets = {
+      GITHUB_TOKEN = "/${var.cdn_name}/${var.env}/github.token"
+      GITHUB_USER = "/${var.cdn_name}/${var.env}/github.user"
+    }
+
     task_policies = [
       "arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess",
       "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",

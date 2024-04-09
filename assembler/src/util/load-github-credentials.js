@@ -55,9 +55,9 @@ async function fromLocalFile() {
 }
 
 async function fromParameterStore(env) {
-    let prefix = `web-community-cdn.${env}`;
-    let userParam = `${prefix}.github.user`;
-    let tokenParam = `${prefix}.github.token`;
+    let prefix = `cdn-terraform/${env}`;
+    let userParam = `${prefix}/github.user`;
+    let tokenParam = `${prefix}/github.token`;
 
     let data = await ssm.getParameters({
         Names: [

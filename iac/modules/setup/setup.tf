@@ -34,3 +34,20 @@ module "my_ecr" {
   name   = "${var.cdn_name}-assembler"
 }
 
+# SSM parameters
+
+resource "aws_ssm_parameter" "secrets" {
+  for_each = {
+    "github.token" = "temporary"
+    "github.user" = "temporary"
+  }
+  name  = "/${var.cdn_name}/${var.env}/${each.key}"
+  type  = "SecureString"
+  value = each.value
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+}
+
