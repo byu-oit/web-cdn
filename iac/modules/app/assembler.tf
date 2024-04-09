@@ -16,7 +16,7 @@ module "assembler" {
 
     secrets = {
       GITHUB_TOKEN = "/${var.cdn_name}/${var.env}/github.token"
-      GITHUB_USER = "/${var.cdn_name}/${var.env}/github.user"
+      GITHUB_USER  = "/${var.cdn_name}/${var.env}/github.user"
     }
 
     task_policies = [

@@ -39,7 +39,7 @@ module "my_ecr" {
 resource "aws_ssm_parameter" "secrets" {
   for_each = {
     "github.token" = "temporary"
-    "github.user" = "temporary"
+    "github.user"  = "temporary"
   }
   name  = "/${var.cdn_name}/${var.env}/${each.key}"
   type  = "SecureString"
