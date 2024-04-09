@@ -5,7 +5,7 @@ module "assembler" {
 
   primary_container_definition = {
     name        = "${var.cdn_name}-${var.env}-assembler"
-    image       = "${data.aws_ecr_repository.assembler_ecr_repo.name}:${var.image_tag}" # FIXME: should name be used?
+    image       = "${data.aws_ecr_repository.assembler_ecr_repo.repository_url}:${var.image_tag}" # FIXME: should name be used?
     task_cpu    = 4096
     task_memory = 8192
     environment_variables = { # TODO: Fill in missing refs
@@ -21,10 +21,10 @@ module "assembler" {
 
     task_policies = [
       "arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess",
-      "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
-      aws_iam_policy.AllowCdnParameterStoreAccess.arn,
+#      "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
+#      aws_iam_policy.AllowCdnParameterStoreAccess.arn,
       aws_iam_policy.AllowCloudFrontInvalidation.arn,
-      aws_iam_policy.AllowAssemblerImageAccess.arn
+#      aws_iam_policy.AllowAssemblerImageAccess.arn
     ]
   }
 
