@@ -68,18 +68,28 @@ resource "random_string" "cf_key" {
 data "aws_iam_policy_document" "static_website" {
   statement {
     sid       = "1"
-    actions   = ["s3:GetObject"]
-    resources = ["${aws_s3_bucket.CdnContentBucket.arn}/*"]
+    actions   = ["s3:ListBucket", "s3:PutBucketWebsite", "s3:Get*"]
+    resources = [aws_s3_bucket.CdnContentBucket.arn]
 
     principals {
       identifiers = ["*"]
       type        = "AWS"
     }
 
-    condition {
-      test     = "StringLike"
-      values   = [random_string.cf_key.result]
-      variable = "aws:Referer"
+    #    condition {
+    #      test     = "StringLike"
+    #      values   = [random_string.cf_key.result]
+    #      variable = "aws:Referer"
+    #    }
+  }
+  statement {
+    sid       = "2"
+    actions   = ["s3:*"]
+    resources = ["${aws_s3_bucket.CdnContentBucket.arn}/*"]
+
+    principals {
+      identifiers = ["*"]
+      type        = "AWS"
     }
   }
 }
@@ -97,7 +107,7 @@ resource "aws_s3_bucket_ownership_controls" "content_bucket" {
   depends_on = [aws_s3_bucket_public_access_block.content_bucket]
   bucket     = aws_s3_bucket.CdnContentBucket.id
   rule {
-    object_ownership = "BucketOwnerEnforced"
+    object_ownership = "BucketOwnerPreferred"
   }
 }
 
@@ -110,9 +120,16 @@ resource "aws_s3_bucket_policy" "cdn_bucket_read" {
 #resource "aws_s3_bucket_acl" "content_bucket" {
 #  depends_on = [
 #    aws_s3_bucket_ownership_controls.content_bucket,
-##    aws_s3_bucket_public_access_block.content_bucket,
+#    #    aws_s3_bucket_public_access_block.content_bucket,
 #  ]
 #
 #  bucket = aws_s3_bucket.CdnContentBucket.id
 #  acl    = "public-read"
 #}
+
+resource "aws_s3_bucket_versioning" "bucket_versioning" {
+  bucket = aws_s3_bucket.CdnContentBucket.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}

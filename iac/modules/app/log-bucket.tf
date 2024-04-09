@@ -6,7 +6,7 @@ resource "aws_s3_bucket" "LogBucket" {
 }
 
 resource "aws_s3_bucket_public_access_block" "log_bucket" {
-  bucket = aws_s3_bucket.CdnContentBucket.id
+  bucket = aws_s3_bucket.LogBucket.id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -23,7 +23,7 @@ resource "aws_s3_bucket_ownership_controls" "log_bucket" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "log_bucket_config" {
-  bucket = aws_s3_bucket.CdnContentBucket.id
+  bucket = aws_s3_bucket.LogBucket.id
 
   rule {
     id     = "ExpireUnprocessedLogs"
@@ -66,7 +66,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "log_bucket_config" {
 #    aws_s3_bucket_public_access_block.log_bucket,
 #  ]
 #
-#  bucket = aws_s3_bucket.CdnContentBucket.id
+#  bucket = aws_s3_bucket.LogBucket.id
 #  acl    = "log"
 #}
 
