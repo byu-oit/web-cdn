@@ -3,7 +3,6 @@ variable "s3_bucket_name" {
   description = "Name of S3 bucket for website"
 }
 
-# TODO possibly add allow CORS
 resource "aws_s3_bucket" "CdnContentBucket" {
   bucket = "${var.cdn_name}-${var.env}-contents-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}-temp"
 }
