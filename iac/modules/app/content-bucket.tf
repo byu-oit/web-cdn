@@ -139,12 +139,6 @@ resource "aws_s3_bucket_policy" "allow_builder_access" {
   policy = data.aws_iam_policy_document.CdnContentBucketAllowBuilderUpdates.json
 }
 
-resource "aws_s3_bucket_policy" "allow_builder_object_access" {
-  bucket = aws_s3_bucket.CdnContentBucket.id
-  policy = data.aws_iam_policy_document.builder_objects_access.json
-}
-
-
 data "aws_iam_policy_document" "CdnContentBucketAllowBuilderUpdates" {
   statement {
     principals {
@@ -162,9 +156,6 @@ data "aws_iam_policy_document" "CdnContentBucketAllowBuilderUpdates" {
       aws_s3_bucket.CdnContentBucket.arn
     ]
   }
-}
-
-data "aws_iam_policy_document" "builder_objects_access" {
   statement {
     principals {
       type        = "AWS"
