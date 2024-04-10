@@ -21,11 +21,48 @@ module "assembler" {
 
     task_policies = [
       "arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess",
-      aws_iam_policy.AllowCloudFrontInvalidation.arn
+      aws_iam_policy.AllowCloudFrontInvalidation.arn,
+      aws_iam_policy.allow_builder_access_s3.arn,
+      aws_iam_policy.allow_builder_access_s3_objects.arn
     ]
   }
 
   vpc_id                        = module.acs.vpc.id
   private_subnet_ids            = module.acs.private_subnet_ids
   role_permissions_boundary_arn = module.acs.role_permissions_boundary.arn
+}
+
+resource "aws_iam_policy" "allow_builder_access_s3" {
+  depends_on = [aws_s3_bucket.CdnContentBucket]
+  name       = "allow_builder_access_s3"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:ListBucket",
+          "s3:PutBucketWebsite",
+          "s3:Get*",
+        ],
+        "Resource" : aws_s3_bucket.CdnContentBucket.arn
+      }
+    ]
+  })
+}
+resource "aws_iam_policy" "allow_builder_access_s3_objects" {
+  depends_on = [aws_s3_bucket.CdnContentBucket]
+  name       = "allow_builder_access_s3_objects"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:*"
+        ],
+        "Resource" : "${aws_s3_bucket.CdnContentBucket.arn}/*"
+      }
+    ]
+  })
 }
