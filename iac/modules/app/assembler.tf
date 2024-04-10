@@ -22,8 +22,7 @@ module "assembler" {
     task_policies = [
       "arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess",
       aws_iam_policy.AllowCloudFrontInvalidation.arn,
-      aws_iam_policy.allow_builder_access_s3.arn,
-      aws_iam_policy.allow_builder_access_s3_objects.arn
+      aws_iam_policy.allow_builder_access_s3.arn
     ]
   }
 
@@ -43,27 +42,34 @@ resource "aws_iam_policy" "allow_builder_access_s3" {
         "Action" : [
           "s3:ListBucket",
           "s3:PutBucketWebsite",
-          "s3:Get*"
-        ],
-        "Resource" : aws_s3_bucket.CdnContentBucket.arn
-      }
-    ]
-  })
-}
-resource "aws_iam_policy" "allow_builder_access_s3_objects" {
-  depends_on = [aws_s3_bucket.CdnContentBucket]
-  name       = "allow_builder_access_s3_objects"
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Effect" : "Allow",
-        "Action" : [
+          "s3:Get*",
           "s3:*",
-          "s3:PutObject"
+          "s3:PutObject",
+          "s3:PutObjectAcl"
         ],
-        "Resource" : "${aws_s3_bucket.CdnContentBucket.arn}/*"
+        "Resource" = [
+          aws_s3_bucket.CdnContentBucket.arn,
+          "${aws_s3_bucket.CdnContentBucket.arn}/*"
+        ]
       }
     ]
   })
 }
+#resource "aws_iam_policy" "allow_builder_access_s3_objects" {
+#  depends_on = [aws_s3_bucket.CdnContentBucket]
+#  name       = "allow_builder_access_s3_objects"
+#  policy = jsonencode({
+#    "Version" : "2012-10-17",
+#    "Statement" : [
+#      {
+#        "Effect" : "Allow",
+#        "Action" : [
+#          "s3:*",
+#          "s3:PutObject",
+#          "s3:PutObjectAcl"
+#        ],
+#        "Resource" : "${aws_s3_bucket.CdnContentBucket.arn}/*"
+#      }
+#    ]
+#  })
+#}
