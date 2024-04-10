@@ -136,32 +136,47 @@ resource "aws_s3_bucket_versioning" "bucket_versioning" {
 
 resource "aws_s3_bucket_policy" "allow_builder_access" {
   bucket = aws_s3_bucket.CdnContentBucket.id
-  policy = aws_iam_policy.CdnContentBucketAllowBuilderUpdates.arn
+  policy = data.aws_iam_policy_document.CdnContentBucketAllowBuilderUpdates.json
+}
+
+resource "aws_s3_bucket_policy" "allow_builder_object_access" {
+  bucket = aws_s3_bucket.CdnContentBucket.id
+  policy = data.aws_iam_policy_document.builder_objects_access.json
 }
 
 
-resource "aws_iam_policy" "CdnContentBucketAllowBuilderUpdates" {
-  name        = "CdnContentBucketAllowBuilderUpdates"
-  description = "Allows assembler to access s3 content bucket"
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Effect" : "Allow",
-        "Action" : [
-          "s3:ListBucket",
-          "s3:PutBucketWebsite",
-          "s3:Get*"
-        ],
-        "Resource" : "arn:aws:s3:::${aws_s3_bucket.CdnContentBucket.id}"
-      },
-      {
-        "Effect" : "Allow",
-        "Action" : [
-          "s3:*",
-        ],
-        "Resource" : "arn:aws:s3:::${aws_s3_bucket.CdnContentBucket.id}/*"
-      }
+data "aws_iam_policy_document" "CdnContentBucketAllowBuilderUpdates" {
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.CdnBuilderRole.arn]
+    }
+
+    actions = [
+      "s3:ListBucket",
+      "s3:PutBucketWebsite",
+      "s3:Get*",
     ]
-  })
+
+    resources = [
+      aws_s3_bucket.CdnContentBucket.arn
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "builder_objects_access" {
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.CdnBuilderRole.arn]
+    }
+
+    actions = [
+      "s3:*"
+    ]
+
+    resources = [
+      "${aws_s3_bucket.CdnContentBucket.arn}/*",
+    ]
+  }
 }
