@@ -136,11 +136,11 @@ resource "aws_s3_bucket_versioning" "bucket_versioning" {
 
 resource "aws_s3_bucket_policy" "allow_builder_access" {
   bucket = aws_s3_bucket.CdnContentBucket.id
-  policy = data.aws_iam_policy.CdnContentBucketAllowBuilderUpdates.arn
+  policy = aws_iam_policy.CdnContentBucketAllowBuilderUpdates.arn
 }
 
 
-data  "aws_iam_policy" "CdnContentBucketAllowBuilderUpdates" {
+resource "aws_iam_policy" "CdnContentBucketAllowBuilderUpdates" {
   name        = "CdnContentBucketAllowBuilderUpdates"
   description = "Allows assembler to access s3 content bucket"
   policy = jsonencode({
@@ -160,7 +160,7 @@ data  "aws_iam_policy" "CdnContentBucketAllowBuilderUpdates" {
         "Action" : [
           "s3:*",
         ],
-        "Resource" :"arn:aws:s3:::${aws_s3_bucket.CdnContentBucket.id}/*"
+        "Resource" : "arn:aws:s3:::${aws_s3_bucket.CdnContentBucket.id}/*"
       }
     ]
   })
