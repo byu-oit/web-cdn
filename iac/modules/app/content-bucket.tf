@@ -135,6 +135,7 @@ resource "aws_s3_bucket_versioning" "bucket_versioning" {
 }
 
 resource "aws_s3_bucket_policy" "allow_builder_access" {
+  depends_on = [aws_s3_bucket_ownership_controls.content_bucket]
   bucket = aws_s3_bucket.CdnContentBucket.id
   policy = data.aws_iam_policy_document.CdnContentBucketAllowBuilderUpdates.json
 }
