@@ -43,8 +43,7 @@ resource "aws_iam_policy" "allow_builder_access_s3" {
         "Action" : [
           "s3:ListBucket",
           "s3:PutBucketWebsite",
-          "s3:Get*",
-          "s3:PutObject"
+          "s3:Get*"
         ],
         "Resource" : aws_s3_bucket.CdnContentBucket.arn
       }
@@ -60,7 +59,8 @@ resource "aws_iam_policy" "allow_builder_access_s3_objects" {
       {
         "Effect" : "Allow",
         "Action" : [
-          "s3:*"
+          "s3:*",
+          "s3:PutObject"
         ],
         "Resource" : "${aws_s3_bucket.CdnContentBucket.arn}/*"
       }
