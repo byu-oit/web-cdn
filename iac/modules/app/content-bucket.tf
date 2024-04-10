@@ -133,3 +133,35 @@ resource "aws_s3_bucket_versioning" "bucket_versioning" {
     status = "Enabled"
   }
 }
+
+resource "aws_s3_bucket_policy" "allow_builder_access" {
+  bucket = aws_s3_bucket.CdnContentBucket.id
+  policy = data.aws_iam_policy.CdnContentBucketAllowBuilderUpdates.arn
+}
+
+
+data  "aws_iam_policy" "CdnContentBucketAllowBuilderUpdates" {
+  name        = "CdnContentBucketAllowBuilderUpdates"
+  description = "Allows assembler to access s3 content bucket"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:ListBucket",
+          "s3:PutBucketWebsite",
+          "s3:Get*"
+        ],
+        "Resource" : "arn:aws:s3:::${aws_s3_bucket.CdnContentBucket.id}"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:*",
+        ],
+        "Resource" :"arn:aws:s3:::${aws_s3_bucket.CdnContentBucket.id}/*"
+      }
+    ]
+  })
+}

@@ -62,42 +62,6 @@ resource "aws_iam_policy" "AllowCloudFrontInvalidation" {
   })
 }
 
-resource "aws_iam_policy" "CdnContentBucketAllowBuilderUpdates" {
-  name        = "CdnContentBucketAllowBuilderUpdates"
-  description = "Allows S3 Access From Assembler"
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Effect" : "Allow",
-        "Action" : [
-          "s3:ListBucket",
-          "s3:PutBucketWebsite",
-          "s3:Get*"
-        ],
-        "Resource" : "arn:aws:s3:::${aws_s3_bucket.CdnContentBucket.id}"
-      }
-    ]
-  })
-}
-
-resource "aws_iam_policy" "S3ObjectAccess" {
-  name        = "S3ObjectAccess"
-  description = "Allows S3 Object Access From Assembler"
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Effect" : "Allow",
-        "Action" : [
-          "s3:*",
-        ],
-        "Resource" : "arn:aws:s3:::${aws_s3_bucket.CdnContentBucket.id}/*"
-      }
-    ]
-  })
-}
-
 data "aws_ecr_repository" "assembler_ecr_repo" {
   name = "${var.cdn_name}-assembler"
 }
@@ -142,18 +106,6 @@ resource "aws_iam_role_policy_attachment" "AllowAssemblerImageAccessAttachment" 
   depends_on = [aws_iam_policy.AllowAssemblerImageAccess, aws_iam_role.CdnBuilderRole]
   role       = aws_iam_role.CdnBuilderRole.name
   policy_arn = aws_iam_policy.AllowAssemblerImageAccess.arn
-}
-
-resource "aws_iam_role_policy_attachment" "S3ObjectAccess" {
-  depends_on = [aws_iam_policy.S3ObjectAccess, aws_iam_role.CdnBuilderRole]
-  role       = aws_iam_role.CdnBuilderRole.name
-  policy_arn = aws_iam_policy.S3ObjectAccess.arn
-}
-
-resource "aws_iam_role_policy_attachment" "CdnContentBucketAllowBuilderUpdates" {
-  depends_on = [aws_iam_policy.CdnContentBucketAllowBuilderUpdates, aws_iam_role.CdnBuilderRole]
-  role       = aws_iam_role.CdnBuilderRole.name
-  policy_arn = aws_iam_policy.CdnContentBucketAllowBuilderUpdates.arn
 }
 
 data "aws_iam_policy_document" "ecs_invokation_policy" {
