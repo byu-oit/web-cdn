@@ -82,16 +82,16 @@ data "aws_iam_policy_document" "static_website" {
       variable = "aws:Referer"
     }
   }
-  #  statement {
-  #    sid       = "2"
-  #    actions   = ["s3:*"]
-  #    resources = ["${aws_s3_bucket.CdnContentBucket.arn}/*"]
-  #
-  #    principals {
-  #      identifiers = ["*"]
-  #      type        = "AWS"
-  #    }
-  #  }
+  statement {
+    sid       = "2"
+    actions   = ["s3:*"]
+    resources = ["${aws_s3_bucket.CdnContentBucket.arn}/*"]
+
+    principals {
+      identifiers = ["*"]
+      type        = "AWS"
+    }
+  }
 }
 
 resource "aws_s3_bucket_public_access_block" "content_bucket" {
