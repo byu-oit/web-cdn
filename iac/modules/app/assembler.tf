@@ -18,13 +18,13 @@ module "assembler" {
       GITHUB_TOKEN = "/${var.cdn_name}/${var.env}/github.token"
       GITHUB_USER  = "/${var.cdn_name}/${var.env}/github.user"
     }
-
-    task_policies = [
-      "arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess",
-      aws_iam_policy.AllowCloudFrontInvalidation.arn,
-      aws_iam_policy.allow_builder_access_s3.arn
-    ]
   }
+
+  task_policies = [
+    "arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess",
+    aws_iam_policy.AllowCloudFrontInvalidation.arn,
+    aws_iam_policy.allow_builder_access_s3.arn
+  ]
 
   vpc_id                        = module.acs.vpc.id
   private_subnet_ids            = module.acs.private_subnet_ids
