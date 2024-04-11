@@ -43,7 +43,8 @@ data "aws_iam_policy_document" "run_assembler_doc" {
       "iam:PassRole"
     ]
     resources = [
-      module.assembler.task_execution_role.arn
+      module.assembler.task_execution_role.arn,
+      module.assembler.task_role.arn
     ]
   }
 }
