@@ -55,9 +55,10 @@
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@types/luxon/-/luxon-1.2.0.tgz#fa52e0d1cb0966a0190b8b7409b1d7e76aacd055"
 
-"@types/node@^10.3.6":
-  version "10.5.1"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.5.1.tgz#d578446f4abff5c0b49ade9b4e5274f6badaadfc"
+"@types/node@^16.18.96":
+  version "16.18.96"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.18.96.tgz#eb0012d23ff53d14d64ec8a352bf89792de6aade"
+  integrity sha512-84iSqGXoO+Ha16j8pRZ/L90vDMKX04QTYMTfYeE1WrjWaZXuchBehGUZEpNgx7JnmlrIHdnABmpjrQjhCnNldQ==
 
 acorn-walk@^8.1.1:
   version "8.2.0"
