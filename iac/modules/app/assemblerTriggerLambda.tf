@@ -22,7 +22,8 @@ resource "aws_iam_role" "CdnBuildInvokerRole" {
   path                 = "/${var.cdn_name}/"
   permissions_boundary = module.acs.role_permissions_boundary.arn
   managed_policy_arns = [
-    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+    aws_iam_policy.run_assembler.arn
   ]
 }
 
@@ -51,12 +52,6 @@ resource "aws_iam_policy" "run_assembler" {
   name        = "run-assembler-task-${var.env}"
   description = "Allows the trigger lambda to start the assembler ecs task"
   policy      = data.aws_iam_policy_document.run_assembler_doc.json
-}
-
-resource "aws_iam_role_policy_attachment" "run_assembler" {
-  depends_on = [aws_iam_policy.run_assembler, aws_iam_role.CdnBuildInvokerRole]
-  role       = aws_iam_role.CdnBuildInvokerRole.name
-  policy_arn = aws_iam_policy.run_assembler.arn
 }
 
 resource "aws_lambda_function" "WebhookFunc" {
