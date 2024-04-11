@@ -169,9 +169,9 @@ resource "aws_cloudfront_distribution" "WebsiteCloudfront" {
     origin_id   = "only-origin"
     domain_name = aws_s3_bucket.CdnContentBucket.bucket_domain_name
 
-#    s3_origin_config {
-#      origin_access_identity = ""
-#    }
+    #    s3_origin_config {
+    #      origin_access_identity = ""
+    #    }
 
     # TODO: why is this commented in the cloudbuild spec???
     #    domain_name = aws_s3_bucket_website_configuration.CdnContentBucket.website_endpoint
