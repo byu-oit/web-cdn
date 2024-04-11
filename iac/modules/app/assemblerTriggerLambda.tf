@@ -47,7 +47,7 @@ resource "aws_iam_policy" "run_assembler" {
 resource "aws_iam_role_policy_attachment" "run_assembler" {
   depends_on = [aws_iam_policy.run_assembler, aws_iam_role.CdnBuildInvokerRole]
   role       = aws_iam_role.CdnBuildInvokerRole.name
-  policy_arn = aws_iam_policy.run_assembler
+  policy_arn = aws_iam_policy.run_assembler.arn
 }
 
 resource "aws_lambda_function" "WebhookFunc" {
