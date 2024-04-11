@@ -25,7 +25,6 @@ resource "aws_lambda_function" "WebhookFunc" {
   handler          = "lambda.handler"
   runtime          = "nodejs16.x"
   source_code_hash = base64sha256(data.archive_file.WebhookFuncLambda.output_path)
-  publish          = true
   timeout          = 60
   memory_size      = 128
 
@@ -73,6 +72,7 @@ resource "aws_lambda_permission" "apigw_lambda" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.WebhookFunc.function_name
   principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.WebHookDomain.execution_arn}/*/*"
 }
 
 resource "aws_api_gateway_integration" "lambda_integration" {
