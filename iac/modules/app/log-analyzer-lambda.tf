@@ -1,3 +1,5 @@
+
+# Log Sorter/Analyzer Lambda
 data "archive_file" "LogAnalyzerSorterFuncLambda" {
   type        = "zip"
   source_dir  = "../../../log-analyzer/sorter-lambda/"
@@ -24,6 +26,8 @@ resource "aws_lambda_function" "LogAnalyzerSorterFunc" {
     }
   }
 }
+
+# Trigger for Log Bucket to call Sorter/Analyzer Lambda when things are added
 
 resource "aws_lambda_permission" "LogAnalyzerSorterTriggerPermission" {
   statement_id  = "LogAnalyzerSorterTriggerPermission"

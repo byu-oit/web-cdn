@@ -78,3 +78,35 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "logging_encryptio
     }
   }
 }
+
+# Bucket policy to allow things with a certain role to add stuff to this bucket
+resource "aws_s3_bucket_policy" "LogBucketAllowLogPutsUpdates" {
+  bucket = aws_s3_bucket.LogBucket.id
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : aws_iam_role.EdgeLambdaExecutionRole.arn
+        },
+        "Action" : [
+          "s3:ListBucket",
+          "s3:PutBucketWebsite",
+          "s3:Get*"
+        ],
+        "Resource" = aws_s3_bucket.LogBucket.arn
+      },
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : aws_iam_role.EdgeLambdaExecutionRole.arn
+        },
+        "Action" : [
+          "s3:*"
+        ],
+        "Resource" = "${aws_s3_bucket.LogBucket.arn}/*"
+      }
+    ]
+  })
+}
