@@ -68,6 +68,13 @@ resource "aws_api_gateway_method" "proxy_method" {
   authorization = "NONE"
 }
 
+resource "aws_lambda_permission" "apigw_lambda" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.WebhookFunc.function_name
+  principal     = "apigateway.amazonaws.com"
+}
+
 resource "aws_api_gateway_integration" "lambda_integration" {
   rest_api_id             = aws_api_gateway_rest_api.WebHookDomain.id
   resource_id             = aws_api_gateway_resource.proxy.id
