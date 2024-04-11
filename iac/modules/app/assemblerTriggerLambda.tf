@@ -81,7 +81,7 @@ resource "aws_api_gateway_deployment" "deployment" {
 }
 
 resource "aws_route53_record" "webhooks_a_record" {
-  name            = "webhooks.${var.cdn_name}-${var.env}"
+  name            = "webhooks"
   type            = "A"
   zone_id         = local.root_dns_id
   allow_overwrite = false
@@ -93,7 +93,7 @@ resource "aws_route53_record" "webhooks_a_record" {
 }
 
 resource "aws_route53_record" "webhooks_aaaa_record" {
-  name            = "webhooks.${var.cdn_name}-${var.env}"
+  name            = "webhooks"
   type            = "AAAA"
   zone_id         = local.root_dns_id
   allow_overwrite = false
