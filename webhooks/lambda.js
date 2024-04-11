@@ -36,7 +36,7 @@ const options = {
     skipCallerValidation: process.env[SKIP_CALLER_VALIDATION_ENV] === 'true',
     taskCluster: requireEnv(TASK_CLUSTER_ENV),
     assemblerSecurityGroupID: requireEnv(ASSEMBLER_SECURITY_GROUP_ID_ENV),
-    assemblerSubnetIDs: requireEnv(ASSEMBLER_SUBNET_IDS_ENV)
+    assemblerSubnetIDs: JSON.parse(requireEnv(ASSEMBLER_SUBNET_IDS_ENV))
 };
 
 const server = awsServerlessExpress.createServer(webhooks(options));
