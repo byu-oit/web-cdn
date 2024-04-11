@@ -29,8 +29,8 @@ resource "aws_lambda_permission" "LogAnalyzerSorterTriggerPermission" {
   statement_id  = "LogAnalyzerSorterTriggerPermission"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.LogAnalyzerSorterFunc.arn
-  #   principal     = "s3.amazonaws.com"
-  principal  = data.aws_caller_identity.current.account_id # TODO figure this out
+  principal     = "s3.amazonaws.com"
+#   principal  = data.aws_caller_identity.current.account_id # TODO figure this out
   source_arn = aws_s3_bucket.LogBucket.arn
 }
 
