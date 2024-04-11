@@ -23,7 +23,7 @@ const ecs = new aws.ECS({
 })
 
 module.exports = async function startAssembler(options) {
-  console.log(`Starting Assembler Codebuild Project ${options.mainConfigRepo}@${options.mainConfigBranch}`)
+  console.log(`Starting Assembler ECS Task ${options.mainConfigRepo}@${options.mainConfigBranch}`)
 
   const params = {
     taskDefinition: options.taskDefinition,

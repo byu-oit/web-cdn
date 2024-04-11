@@ -4,18 +4,50 @@ data "archive_file" "WebhookFuncLambda" {
   output_path = "../../../webhooks.zip"
 }
 
-resource "aws_iam_policy" "CdnBuildInvokerPolicy" {
-  name = "AllowBuildInvocation"
-  policy = jsonencode({
+# CdnBuildInvokerRole
+resource "aws_iam_role" "CdnBuildInvokerRole" {
+  name = "CdnBuildInvokerRole"
+  assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
       {
         "Effect" : "Allow",
-        "Action" : "codebuild:StartBuild",
-        "Resource" : "arn:aws:codebuild:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:project/${var.cdn_name}-*-assembler"
-      }
+        "Principal" : {
+          "Service" : "lambda.amazonaws.com"
+        },
+        "Action" : "sts:AssumeRole"
+      },
     ]
   })
+  path                 = "/${var.cdn_name}/"
+  permissions_boundary = module.acs.role_permissions_boundary.arn
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  ]
+}
+
+data "aws_iam_policy_document" "run_assembler_doc" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ecs:RunTask"
+    ]
+    resources = [
+      module.assembler.task_definition.arn
+    ]
+  }
+}
+
+resource "aws_iam_policy" "run_assembler" {
+  name        = "run-assembler-task-${var.env}"
+  description = "Allows the trigger lambda to start the assembler ecs task"
+  policy      = data.aws_iam_policy_document.run_assembler_doc.json
+}
+
+resource "aws_iam_role_policy_attachment" "run_assembler" {
+  depends_on = [aws_iam_policy.run_assembler, aws_iam_role.CdnBuildInvokerRole]
+  role       = aws_iam_role.CdnBuildInvokerRole.name
+  policy_arn = aws_iam_policy.run_assembler
 }
 
 resource "aws_lambda_function" "WebhookFunc" {
