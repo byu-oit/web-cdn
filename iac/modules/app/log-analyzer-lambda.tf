@@ -35,7 +35,7 @@ resource "aws_lambda_permission" "LogAnalyzerSorterTriggerPermission" {
 }
 
 resource "aws_s3_bucket_notification" "LogAnalyzerSorterFuncTrigger" {
-  bucket = aws_s3_bucket.LogBucket.arn
+  bucket = aws_s3_bucket.LogBucket.id
 
   lambda_function {
     lambda_function_arn = aws_lambda_function.LogAnalyzerSorterFunc.id
@@ -43,5 +43,5 @@ resource "aws_s3_bucket_notification" "LogAnalyzerSorterFuncTrigger" {
     filter_prefix       = local.unprocessed_log_prefix
   }
 
-  depends_on = [aws_lambda_permission.LogAnalyzerSorterTriggerPermission]
+  depends_on = [aws_lambda_permission.LogAnalyzerSorterTriggerPermission, aws_s3_bucket.LogBucket]
 }
