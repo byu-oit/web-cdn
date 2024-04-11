@@ -35,7 +35,7 @@ resource "aws_lambda_permission" "LogAnalyzerSorterTriggerPermission" {
 }
 
 resource "aws_s3_bucket_notification" "LogAnalyzerSorterFuncTrigger" {
-  bucket = aws_s3_bucket.LogBucket.id
+  bucket = aws_s3_bucket.LogBucket.arn
 
   lambda_function {
     lambda_function_arn = aws_lambda_function.LogAnalyzerSorterFunc.id
