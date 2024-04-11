@@ -36,6 +36,15 @@ data "aws_iam_policy_document" "run_assembler_doc" {
       module.assembler.task_definition.arn
     ]
   }
+  statement {
+    effect = "Allow"
+    actions = [
+      "iam:PassRole"
+    ]
+    resources = [
+      module.assembler.task_execution_role.arn
+    ]
+  }
 }
 
 resource "aws_iam_policy" "run_assembler" {
