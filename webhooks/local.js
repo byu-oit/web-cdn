@@ -25,6 +25,6 @@ app({
     mainConfigBranch: 'master',
     skipCallerValidation: true,
 }).listen(8000, function() {
-    console.log('listening on port 3000')
+    console.log('listening on port 8000')
 });
 

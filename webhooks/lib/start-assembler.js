@@ -17,19 +17,32 @@
 
 "use strict";
 
-const AWS = require('aws-sdk');
-const CodeBuild = new AWS.CodeBuild();
-const HttpError = require('./http-error');
+const aws = require('@aws-sdk/client-ecs')
+const ecs = new aws.ECS({
+  region: 'us-east-1'
+})
 
-module.exports = function startAssembler(name, branch) {
-    console.log(`Starting Assembler Codebuild Project ${name}@${branch}`);
-    return CodeBuild.startBuild({
-        projectName: name,
-        sourceVersion: branch
-    }).promise()
-        .catch(err => {
-            console.error('got codebuild error', err);
-            throw new HttpError(500, 'Unable to start codebuild: ' + err.message);
-        })
-        .then(data => data.build.id);
-};
+module.exports = async function startAssembler(options) {
+  console.log(`Starting Assembler Codebuild Project ${options.mainConfigRepo}@${options.mainConfigBranch}`)
+
+  const params = {
+    taskDefinition: options.taskDefinition,
+    cluster: options.taskCluster,
+    launchType: 'FARGATE',
+    networkConfiguration: {
+      awsvpcConfiguration: {
+        securityGroups: [options.assemblerSecurityGroupID],
+        subnets: options.assemblerSubnetIDs,
+        assignPublicIp: 'DISABLED'
+      }
+    },
+    propagateTags: 'TASK_DEFINITION'
+  }
+
+  try {
+    const taskResult = await ecs.runTask(params)
+    console.log(`Task Result: ${taskResult}`)
+  } catch (err) {
+    throw new Error(`Something went wrong while starting assembler task with params: ${JSON.stringify(params, null, 2)}, error:, ${err.message}`)
+  }
+}

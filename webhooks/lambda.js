@@ -23,14 +23,20 @@ const webhooks = require('./webhooks');
 
 const MAIN_CONFIG_REPO_ENV = 'CDN_MAIN_CONFIG_REPO';
 const MAIN_CONFIG_BRANCH_ENV = 'CDN_MAIN_CONFIG_BRANCH';
-const CDN_BUILDER_NAME_ENV = 'CDN_BUILDER_NAME';
+const TASK_DEFINITION_ENV = 'TASK_DEFINITION';
 const SKIP_CALLER_VALIDATION_ENV = 'CDN_SKIP_CALLER_VALIDATION';
+const TASK_CLUSTER_ENV = 'TASK_CLUSTER';
+const ASSEMBLER_SECURITY_GROUP_ID_ENV = 'ASSEMBLER_SECURITY_GROUP_ID';
+const ASSEMBLER_SUBNET_IDS_ENV = 'ASSEMBLER_SUBNET_IDS';
 
 const options = {
     mainConfigRepo: process.env[MAIN_CONFIG_REPO_ENV],
     mainConfigBranch: process.env[MAIN_CONFIG_BRANCH_ENV],
-    assemblerCodebuildName: requireEnv(CDN_BUILDER_NAME_ENV),
+    taskDefinition: requireEnv(TASK_DEFINITION_ENV),
     skipCallerValidation: process.env[SKIP_CALLER_VALIDATION_ENV] === 'true',
+    taskCluster: requireEnv(TASK_CLUSTER_ENV),
+    assemblerSecurityGroupID: requireEnv(ASSEMBLER_SECURITY_GROUP_ID_ENV),
+    assemblerSubnetIDs: requireEnv(ASSEMBLER_SUBNET_IDS_ENV)
 };
 
 const server = awsServerlessExpress.createServer(webhooks(options));
