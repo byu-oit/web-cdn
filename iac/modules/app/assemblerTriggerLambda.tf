@@ -32,7 +32,7 @@ resource "aws_lambda_function" "WebhookFunc" {
     variables = {
       ASSEMBLER_SECURITY_GROUP_ID = module.assembler.fargate_security_group.id
       ASSEMBLER_SUBNET_IDS        = jsonencode(module.acs.private_subnet_ids)
-      CDN_SKIP_CALLER_VALIDATION  = "false"
+      CDN_SKIP_CALLER_VALIDATION  = var.env != "dev" // TODO: alway set to false
       TASK_CLUSTER                = module.assembler.new_ecs_cluster.name
       TASK_DEFINITION             = module.assembler.task_definition.id
       CDN_MAIN_CONFIG_REPO        = "byu-oit/web-cdn"

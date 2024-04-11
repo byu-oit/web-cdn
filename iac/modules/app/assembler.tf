@@ -55,21 +55,3 @@ resource "aws_iam_policy" "allow_builder_access_s3" {
     ]
   })
 }
-#resource "aws_iam_policy" "allow_builder_access_s3_objects" {
-#  depends_on = [aws_s3_bucket.CdnContentBucket]
-#  name       = "allow_builder_access_s3_objects"
-#  policy = jsonencode({
-#    "Version" : "2012-10-17",
-#    "Statement" : [
-#      {
-#        "Effect" : "Allow",
-#        "Action" : [
-#          "s3:*",
-#          "s3:PutObject",
-#          "s3:PutObjectAcl"
-#        ],
-#        "Resource" : "${aws_s3_bucket.CdnContentBucket.arn}/*"
-#      }
-#    ]
-#  })
-#}
