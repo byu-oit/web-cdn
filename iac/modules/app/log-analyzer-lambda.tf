@@ -9,7 +9,7 @@ resource "aws_lambda_function" "LogAnalyzerSorterFunc" {
   function_name    = "${var.cdn_name}-${var.env}-LogAnalyzer-Sorter"
   role             = aws_iam_role.EdgeLambdaExecutionRole.arn
   handler          = "lib/lambda.handler"
-  runtime          = "nodejs14.x"
+  runtime          = "nodejs16.x"
   source_code_hash = base64sha256(data.archive_file.LogAnalyzerSorterFuncLambda.output_path)
   publish          = true
   timeout          = 20
