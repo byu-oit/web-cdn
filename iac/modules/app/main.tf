@@ -2,29 +2,6 @@ module "acs" {
   source = "github.com/byu-oit/terraform-aws-acs-info?ref=v3.5.0"
 }
 
-# CdnBuilderRole
-resource "aws_iam_role" "CdnBuilderRole" {
-  name = "CdnBuilderRole"
-  assume_role_policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Effect" : "Allow",
-        "Principal" : {
-          "Service" : "codebuild.amazonaws.com"
-        },
-        "Action" : "sts:AssumeRole"
-      }
-    ]
-  })
-  path                 = "/${var.cdn_name}/"
-  permissions_boundary = module.acs.role_permissions_boundary.arn
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess",
-    "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
-  ]
-}
-
 resource "aws_iam_policy" "AllowCdnParameterStoreAccess" {
   name        = "AllowCdnParameterStoreAccess"
   description = "Allows access to CDN parameter store"
@@ -89,25 +66,6 @@ resource "aws_iam_policy" "AllowAssemblerImageAccess" {
     ]
   })
 }
-
-resource "aws_iam_role_policy_attachment" "AllowCdnParameterStoreAccessAttachment" {
-  depends_on = [aws_iam_policy.AllowCdnParameterStoreAccess, aws_iam_role.CdnBuilderRole]
-  role       = aws_iam_role.CdnBuilderRole.name
-  policy_arn = aws_iam_policy.AllowCdnParameterStoreAccess.arn
-}
-
-resource "aws_iam_role_policy_attachment" "AllowCloudFrontInvalidationAttachment" {
-  depends_on = [aws_iam_policy.AllowCloudFrontInvalidation, aws_iam_role.CdnBuilderRole]
-  role       = aws_iam_role.CdnBuilderRole.name
-  policy_arn = aws_iam_policy.AllowCloudFrontInvalidation.arn
-}
-
-resource "aws_iam_role_policy_attachment" "AllowAssemblerImageAccessAttachment" {
-  depends_on = [aws_iam_policy.AllowAssemblerImageAccess, aws_iam_role.CdnBuilderRole]
-  role       = aws_iam_role.CdnBuilderRole.name
-  policy_arn = aws_iam_policy.AllowAssemblerImageAccess.arn
-}
-
 
 # EdgeLambdaExecutionRole
 resource "aws_iam_role" "EdgeLambdaExecutionRole" {
