@@ -24,6 +24,6 @@
     "@types/node": "^16.18.96",
     "aws-sdk": "^2.89.0",
     "ts-node": "^10.9.1",
-    "typescript": "^2.9.2"
+    "typescript": "^4.9.3"
   }
 }
