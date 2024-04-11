@@ -9,6 +9,7 @@
     "node": ">=6.11.0"
   },
   "dependencies": {
+    "@aws-sdk/client-ecs": "^3.554.0",
     "aws-sdk": "^2.9.0",
     "aws-serverless-express": "^3.0.2",
     "body-parser": "^1.17.2",
