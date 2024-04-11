@@ -23,8 +23,9 @@ variable "image_tag" {
 }
 
 locals {
-  env      = "dev"
-  cdn_name = "cdn-terraform"
+  env           = "dev"
+  cdn_name      = "cdn-terraform"
+  config_branch = "terraform" //TODO: change me
 }
 
 provider "aws" {
@@ -53,4 +54,5 @@ module "app" {
   max_ttl             = 60
   min_ttl             = 0
   force_destroy       = true
+  config_branch       = local.config_branch
 }

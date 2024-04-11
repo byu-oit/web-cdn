@@ -6,6 +6,10 @@ variable "env" {
   type = string
 }
 
+variable "config_branch" {
+  type = string
+}
+
 variable "image_tag" {
   type = string
 }
