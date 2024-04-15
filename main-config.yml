@@ -121,10 +121,6 @@ libraries:
     source: github:byuweb/byu-faculty-directory
     configuration:
       type: 'web-component'
-  test-cdn-webhook: # TODO: DELETE THIS
-    source: github:byu-oit-training/test-cdn-webhook
-    configuration:
-      type: 'web-component'
   theme-fonts:
     source: github:byuweb/hoefler-fonts
     configuration:
