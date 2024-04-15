@@ -2,14 +2,14 @@ name: Deploy
 
 on:
   push:
-    branches: [dev, master]
+    branches: [terraform]
     paths-ignore:
       - LICENSE
       - README.md
 concurrency: ${{ github.ref }}
 env:
-  tf_version: "1.1.7" # must match value in terraform-iac/*/app/main.tf
-  node_version: "14.x"
+  tf_version: "1.4.5" # must match value in terraform-iac/*/app/main.tf
+  node_version: "16.x" # must match value in log-analyzer/sorter-lambda/package.json
 
 jobs:
   env:
@@ -17,29 +17,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up DEV Environment Variables
-        if: github.ref == 'refs/heads/dev'
+        if: github.ref == 'refs/heads/terraform'
         run: |
           matrix='{
             "env":[
               {
-                "aws_account":"632558792265",
+                "aws_account":"863362256468",
                 "aws_gha_role":"web-cdn-dev-gha",
                 "rfc_key_name":"standard_change_sandbox_client_key",
                 "rfc_secret_name":"standard_change_sandbox_client_secret",
                 "rfc_template_id":"Codepipeline-Standard-Change",
-                "cdn_name": "web-community-cdn",
-                "account_stack_name": "web-community-cdn-account",
-                "config_repo": "byu-oit/web-cdn",
-                "extra_tags": "data-sensitivity=public repo=https://github.com/byu-oit/web-cdn",
-                "env" : "dev",
-                "root_dns" : "cdn-dev.byu.edu",
-                "config_branch": "dev",
-                "certificate_arn" : "arn:aws:acm:us-east-1:632558792265:certificate/1bc2f81c-2f79-46b3-9d3b-54ce672ba8be"
+                "assembler_ecr_repo_name" : "cdn-terraform-assembler",
+                "tf_working_dir":"./iac/dev/app"
               }
             ]
           }'
           echo matrix=`echo $matrix | jq -c .` >> $GITHUB_ENV
 
+      # TODO: Update for prd
       - name: Set up PRD Environment Variables
         if: github.ref == 'refs/heads/master'
         run: |
@@ -51,14 +46,8 @@ jobs:
                 "rfc_key_name":"standard_change_production_client_key",
                 "rfc_secret_name":"standard_change_production_client_secret",
                 "rfc_template_id":"Codepipeline-Standard-Change",
-                "cdn_name": "web-community-cdn",
-                "account_stack_name": "web-community-cdn-account",
-                "config_repo": "byu-oit/web-cdn",
-                "extra_tags": "data-sensitivity=public repo=https://github.com/byu-oit/web-cdn",
-                "env" : "prd",
-                "root_dns" : "cdn.byu.edu",
-                "config_branch": "master",
-                "certificate_arn" : "arn:aws:acm:us-east-1:204581410681:certificate/18c1b547-de51-43d3-afa5-2bd05493c41c"
+                "assembler_ecr_repo_name": "web-cdn-prd-assembler",
+                "tf_working_dir":"./iac/prd/app"
               }
             ]
           }'
@@ -96,29 +85,61 @@ jobs:
         with:
           node-version: ${{ env.node_version }}
 
-      - name: Setup
-        run: .codebuild/setup.sh
-
-      - name: Install AWSCLI
-        run: pip install awscli --upgrade --user
-
       - name: Lerna Boostrap
         run: lerna bootstrap
 
-      - name: Echo ROOT_DNS
-        env:
-          root_dns: ${{ matrix.env.root_dns }}
-        run: echo $root_dns
+      - name: Copy main-config.yml to /webhooks and /assembler
+        uses: cp ./main-config.yml ./assembler ./webhooks
 
-      - name: Lerna Exec
-        env:
-          ENV: ${{ matrix.env.env }}
-          AWS_ACCOUNT_ID: ${{ steps.awscreds.outputs.aws-account-id }}
-          ROOT_DNS: ${{ matrix.env.root_dns }}
-        run: lerna exec -- ./codebuild.sh
+      - name: Log into Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-      - name: find
-        run: find ./* -mtime +10950 -exec touch {} \;
+      - name: Get Current Timestamp
+        id: date
+        run: echo "timestamp=$(date +'%Y-%m-%d_%H-%M-%S')" >> $GITHUB_OUTPUT
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build and push the Assembler Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPO: ${{ matrix.env.assembler_ecr_repo_name }}
+          IMAGE_TAG: ${{ steps.date.outputs.timestamp }}
+        uses: docker/build-push-action@v3
+        with:
+          context: assembler
+          push: true
+          tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO}}:${{ env.IMAGE_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Terraform Setup
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.tf_version }}
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        working-directory: ${{ matrix.env.tf_working_dir }}
+        run: terraform init
+
+      - name: Terraform Format
+        working-directory: "./"
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Plan
+        working-directory: ${{ matrix.env.tf_working_dir }}
+        run: terraform plan -var 'image_tag=${{ steps.date.outputs.timestamp }}' -input=false -out=plan
+
+      - name: Analyze Terraform Plan
+        uses: byu-oit/github-action-tf-plan-analyzer@v2
+        with:
+          working-directory: ${{ matrix.env.tf_working_dir }}
+          terraform-plan-file: plan
+          divvycloud-username: ${{ secrets.DIVVYCLOUD_USERNAME }}
+          divvycloud-password: ${{ secrets.DIVVYCLOUD_PASSWORD }}
 
       - name: Start Standard Change
         uses: byu-oit/github-action-start-standard-change@v1
@@ -128,17 +149,9 @@ jobs:
           client-secret: ${{ secrets[matrix.env.rfc_secret_name] }}
           template-id: ${{ matrix.env.rfc_template_id }}
 
-      - name: deploy
-        env:
-          cdn_name: ${{ matrix.env.cdn_name }}
-          env: ${{ matrix.env.env }}
-          root_dns: ${{ matrix.env.root_dns }}
-          account_stack_name: ${{ matrix.env.account_stack_name }}
-          certificate_arn: ${{ matrix.env.certificate_arn }}
-          config_repo: ${{ matrix.env.config_repo }}
-          config_branch: ${{ matrix.env.config_branch }}
-          extra_tags: ${{ matrix.env.extra_tags }}
-        run: .aws-infrastructure/deploy-environment.sh $cdn_name $env $root_dns $account_stack_name $certificate_arn $config_repo $config_branch "$extra_tags"
+      - name: Terraform Apply
+        working-directory: ${{ matrix.env.tf_working_dir }}
+        run: terraform apply plan
 
       - name: End Standard Change
         uses: byu-oit/github-action-end-standard-change@v1

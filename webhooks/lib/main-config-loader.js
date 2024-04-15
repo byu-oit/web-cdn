@@ -24,7 +24,7 @@ const fs = require('fs-extra');
 
 
 module.exports = function loadConfig(options) {
-    let localPath = path.join(process.cwd(), '..', 'main-config.yml');
+    let localPath = path.join(process.cwd(), 'main-config.yml');
     return fs.pathExists(localPath).then(hasLocal => {
         if (hasLocal) {
             return fs.readFile(localPath);
