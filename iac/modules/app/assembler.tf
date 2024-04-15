@@ -22,7 +22,7 @@ module "assembler" {
 
   task_policies = [
     "arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess",
-    aws_iam_polallow_cloudfront_invalidation.arn,
+    aws_iam_policy.allow_cloudfront_invalidation.arn,
     aws_iam_policy.allow_builder_access_s3.arn
   ]
 
