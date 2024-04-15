@@ -9,7 +9,7 @@ module "assembler" {
     name  = "${var.cdn_name}-${var.env}-assembler"
     image = "${data.aws_ecr_repository.assembler_ecr_repo.repository_url}:${var.image_tag}" # FIXME: should name be used?
     environment_variables = {
-      "DESTINATION_S3_BUCKET" = aws_s3_bucket_website_configuration.CdnContentBucket.id,
+      "DESTINATION_S3_BUCKET" = aws_s3_bucket_website_configuration.cdn_content_bucket.id,
       "BUILD_ENV"             = var.env,
       "CDN_HOST"              = "${var.cdn_name}-${var.env}.${local.root_dns_name}",
     }
@@ -22,7 +22,7 @@ module "assembler" {
 
   task_policies = [
     "arn:aws:iam::aws:policy/CloudFrontReadOnlyAccess",
-    aws_iam_policy.AllowCloudFrontInvalidation.arn,
+    aws_iam_polallow_cloudfront_invalidation.arn,
     aws_iam_policy.allow_builder_access_s3.arn
   ]
 
@@ -32,7 +32,7 @@ module "assembler" {
 }
 
 resource "aws_iam_policy" "allow_builder_access_s3" {
-  depends_on = [aws_s3_bucket.CdnContentBucket]
+  depends_on = [aws_s3_bucket.cdn_content_bucket]
   name       = "allow_builder_access_s3"
   policy = jsonencode({
     "Version" : "2012-10-17",
@@ -48,8 +48,8 @@ resource "aws_iam_policy" "allow_builder_access_s3" {
           "s3:PutObjectAcl"
         ],
         "Resource" = [
-          aws_s3_bucket.CdnContentBucket.arn,
-          "${aws_s3_bucket.CdnContentBucket.arn}/*"
+          aws_s3_bucket.cdn_content_bucket.arn,
+          "${aws_s3_bucket.cdn_content_bucket.arn}/*"
         ]
       }
     ]

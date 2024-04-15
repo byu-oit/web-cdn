@@ -1,6 +1,6 @@
 resource "aws_lambda_function" "eager_redirect_func" {
   function_name = "${var.cdn_name}-edge-eager-redirect-${var.env}"
-  role          = aws_iam_role.EdgeLambdaExecutionRole.arn
+  role          = aws_iam_role.edge_lambda_execution_role.arn
   package_type  = "Image"
   image_uri     = "${data.aws_ecr_repository.eager_redirect_ecr_repo.repository_url}:${var.image_tag}"
   publish       = true
