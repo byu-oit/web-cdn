@@ -6,10 +6,8 @@ RUN yum update -y
 # The lambda task root is where the source code should go
 WORKDIR $LAMBDA_TASK_ROOT
 
-COPY package*.json ./
+COPY . ./
 RUN npm ci --omit=dev
-
-COPY src ./
 
 ENV NODE_ENV='production'
 CMD [ "index.handler" ]

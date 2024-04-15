@@ -49,8 +49,8 @@ resource "aws_route53_record" "a_record" {
   zone_id         = local.root_dns_id
   allow_overwrite = false
   alias {
-    name                   = aws_cloudfront_distribution.WebsiteCloudfront.domain_name
-    zone_id                = aws_cloudfront_distribution.WebsiteCloudfront.hosted_zone_id
+    name                   = aws_cloudfront_distribution.website_cloudfront.domain_name
+    zone_id                = aws_cloudfront_distribution.website_cloudfront.hosted_zone_id
     evaluate_target_health = false
   }
 }
@@ -61,8 +61,8 @@ resource "aws_route53_record" "aaaa_record" {
   zone_id         = local.root_dns_id
   allow_overwrite = false
   alias {
-    name                   = aws_cloudfront_distribution.WebsiteCloudfront.domain_name
-    zone_id                = aws_cloudfront_distribution.WebsiteCloudfront.hosted_zone_id
+    name                   = aws_cloudfront_distribution.website_cloudfront.domain_name
+    zone_id                = aws_cloudfront_distribution.website_cloudfront.hosted_zone_id
     evaluate_target_health = false
   }
 }
@@ -90,7 +90,7 @@ resource "aws_route53_record" "aaaa_record" {
 #   type    = "CNAME"
 # }
 
-resource "aws_cloudfront_distribution" "WebsiteCloudfront" {
+resource "aws_cloudfront_distribution" "website_cloudfront" {
   comment      = "${local.root_dns_name} - ${var.cdn_name} ${var.env}"
   aliases      = ["${var.cdn_name}-${var.env}.${local.root_dns_name}"]
   enabled      = true
@@ -165,7 +165,7 @@ resource "aws_cloudfront_distribution" "WebsiteCloudfront" {
 
   origin {
     origin_id   = "only-origin"
-    domain_name = aws_s3_bucket.CdnContentBucket.bucket_domain_name
+    domain_name = aws_s3_bucket.cdn_content_bucket.bucket_domain_name
   }
 
   restrictions {

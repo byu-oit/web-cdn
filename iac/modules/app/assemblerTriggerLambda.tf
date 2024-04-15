@@ -1,4 +1,4 @@
-resource "aws_iam_role" "CdnBuildInvokerRole" {
+resource "aws_iam_role" "cdn_build_invoker_role" {
   name = "CdnBuildInvokerRole"
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
@@ -48,9 +48,9 @@ resource "aws_iam_policy" "run_assembler" {
   policy      = data.aws_iam_policy_document.run_assembler_doc.json
 }
 
-resource "aws_lambda_function" "WebhookFunc" {
+resource "aws_lambda_function" "webhook_func" {
   function_name = "${var.cdn_name}-webhooks-${var.env}"
-  role          = aws_iam_role.CdnBuildInvokerRole.arn
+  role          = aws_iam_role.cdn_build_invoker_role.arn
   package_type  = "Image"
   image_uri     = "${data.aws_ecr_repository.webhooks_repo.repository_url}:${var.image_tag}"
   timeout       = 60
@@ -68,26 +68,26 @@ resource "aws_lambda_function" "WebhookFunc" {
   }
 }
 
-resource "aws_api_gateway_rest_api" "WebHookDomain" {
+resource "aws_api_gateway_rest_api" "webhook_domain" {
   name        = "webhook-domain-gateway"
   description = "CDN WebhookDomain API Gateway"
 }
 
 # TODO: change when we deploy to the real domain
-resource "aws_api_gateway_domain_name" "WebHookDomain" {
+resource "aws_api_gateway_domain_name" "webhook_domain" {
   certificate_arn = module.acs.certificate_virginia.arn
   domain_name     = "webhooks.${local.root_dns_name}"
   security_policy = "TLS_1_0"
 }
 
 resource "aws_api_gateway_resource" "proxy" {
-  rest_api_id = aws_api_gateway_rest_api.WebHookDomain.id
-  parent_id   = aws_api_gateway_rest_api.WebHookDomain.root_resource_id
+  rest_api_id = aws_api_gateway_rest_api.webhook_domain.id
+  parent_id   = aws_api_gateway_rest_api.webhook_domain.root_resource_id
   path_part   = "{proxy+}"
 }
 
 resource "aws_api_gateway_method" "proxy_method" {
-  rest_api_id   = aws_api_gateway_rest_api.WebHookDomain.id
+  rest_api_id   = aws_api_gateway_rest_api.webhook_domain.id
   resource_id   = aws_api_gateway_resource.proxy.id
   http_method   = "POST"
   authorization = "NONE"
@@ -96,22 +96,22 @@ resource "aws_api_gateway_method" "proxy_method" {
 resource "aws_lambda_permission" "apigw_lambda" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.WebhookFunc.function_name
+  function_name = aws_lambda_function.webhook_func.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.WebHookDomain.execution_arn}/*/*"
+  source_arn    = "${aws_api_gateway_rest_api.webhook_domain.execution_arn}/*/*"
 }
 
 resource "aws_api_gateway_integration" "lambda_integration" {
-  rest_api_id             = aws_api_gateway_rest_api.WebHookDomain.id
+  rest_api_id             = aws_api_gateway_rest_api.webhook_domain.id
   resource_id             = aws_api_gateway_resource.proxy.id
   integration_http_method = "POST"
   http_method             = aws_api_gateway_method.proxy_method.http_method
   type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.WebhookFunc.invoke_arn
+  uri                     = aws_lambda_function.webhook_func.invoke_arn
 }
 
 resource "aws_api_gateway_deployment" "deployment" {
-  rest_api_id = aws_api_gateway_rest_api.WebHookDomain.id
+  rest_api_id = aws_api_gateway_rest_api.webhook_domain.id
   stage_name  = var.stage_name
   depends_on = [
     aws_api_gateway_integration.lambda_integration,
@@ -125,8 +125,8 @@ resource "aws_route53_record" "webhooks_a_record" {
   zone_id         = local.root_dns_id
   allow_overwrite = false
   alias {
-    name                   = aws_api_gateway_domain_name.WebHookDomain.cloudfront_domain_name
-    zone_id                = aws_api_gateway_domain_name.WebHookDomain.cloudfront_zone_id
+    name                   = aws_api_gateway_domain_name.webhook_domain.cloudfront_domain_name
+    zone_id                = aws_api_gateway_domain_name.webhook_domain.cloudfront_zone_id
     evaluate_target_health = false
   }
 }
@@ -137,14 +137,14 @@ resource "aws_route53_record" "webhooks_aaaa_record" {
   zone_id         = local.root_dns_id
   allow_overwrite = false
   alias {
-    name                   = aws_api_gateway_domain_name.WebHookDomain.cloudfront_domain_name
-    zone_id                = aws_api_gateway_domain_name.WebHookDomain.cloudfront_zone_id
+    name                   = aws_api_gateway_domain_name.webhook_domain.cloudfront_domain_name
+    zone_id                = aws_api_gateway_domain_name.webhook_domain.cloudfront_zone_id
     evaluate_target_health = false
   }
 }
 
 resource "aws_api_gateway_base_path_mapping" "base_path_mapping" {
-  api_id      = aws_api_gateway_rest_api.WebHookDomain.id
+  api_id      = aws_api_gateway_rest_api.webhook_domain.id
   stage_name  = aws_api_gateway_deployment.deployment.stage_name
-  domain_name = aws_api_gateway_domain_name.WebHookDomain.domain_name
+  domain_name = aws_api_gateway_domain_name.webhook_domain.domain_name
 }

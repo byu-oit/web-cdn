@@ -3,12 +3,12 @@ variable "s3_bucket_name" {
   description = "Name of S3 bucket for website"
 }
 
-resource "aws_s3_bucket" "CdnContentBucket" {
+resource "aws_s3_bucket" "cdn_content_bucket" {
   bucket = "${var.cdn_name}-${var.env}-contents-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}-temp"
 }
 
-resource "aws_s3_bucket_website_configuration" "CdnContentBucket" {
-  bucket = aws_s3_bucket.CdnContentBucket.id
+resource "aws_s3_bucket_website_configuration" "cdn_content_bucket" {
+  bucket = aws_s3_bucket.cdn_content_bucket.id
   index_document {
     suffix = var.index_document_name
   }
@@ -18,7 +18,7 @@ resource "aws_s3_bucket_website_configuration" "CdnContentBucket" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "content_bucket_config" {
-  bucket = aws_s3_bucket.CdnContentBucket.id
+  bucket = aws_s3_bucket.cdn_content_bucket.id
 
   rule {
     id     = "ExpireOldVersions"
@@ -41,7 +41,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "content_bucket_config" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "content_encryption" {
-  bucket = aws_s3_bucket.CdnContentBucket.id
+  bucket = aws_s3_bucket.cdn_content_bucket.id
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm = "AES256"
@@ -50,7 +50,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "content_encryptio
 }
 
 resource "aws_s3_bucket_cors_configuration" "cors_config" {
-  bucket = aws_s3_bucket.CdnContentBucket.id
+  bucket = aws_s3_bucket.cdn_content_bucket.id
   cors_rule {
     allowed_methods = ["GET", "HEAD"]
     allowed_origins = ["*"]
@@ -94,7 +94,7 @@ resource "random_string" "cf_key" {
 #}
 
 resource "aws_s3_bucket_public_access_block" "content_bucket" {
-  bucket = aws_s3_bucket.CdnContentBucket.id
+  bucket = aws_s3_bucket.cdn_content_bucket.id
 
   block_public_acls       = false # SS is true
   block_public_policy     = false
@@ -104,7 +104,7 @@ resource "aws_s3_bucket_public_access_block" "content_bucket" {
 
 resource "aws_s3_bucket_ownership_controls" "content_bucket" {
   depends_on = [aws_s3_bucket_public_access_block.content_bucket]
-  bucket     = aws_s3_bucket.CdnContentBucket.id
+  bucket     = aws_s3_bucket.cdn_content_bucket.id
   rule {
     object_ownership = "ObjectWriter"
   }
@@ -122,12 +122,12 @@ resource "aws_s3_bucket_acl" "content_bucket" {
     #    aws_s3_bucket_public_access_block.content_bucket,
   ]
 
-  bucket = aws_s3_bucket.CdnContentBucket.id
+  bucket = aws_s3_bucket.cdn_content_bucket.id
   acl    = "public-read"
 }
 
 resource "aws_s3_bucket_versioning" "bucket_versioning" {
-  bucket = aws_s3_bucket.CdnContentBucket.id
+  bucket = aws_s3_bucket.cdn_content_bucket.id
   versioning_configuration {
     status = "Enabled"
   }
