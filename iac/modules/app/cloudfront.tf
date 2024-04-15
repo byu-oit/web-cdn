@@ -61,8 +61,8 @@ resource "aws_route53_record" "aaaa_record" {
   zone_id         = local.root_dns_id
   allow_overwrite = false
   alias {
-    name                   = aws_cloudfront_distribution.WebsiteCloudfront.domain_name
-    zone_id                = aws_cloudfront_distribution.WebsiteCloudfront.hosted_zone_id
+    name                   = aws_cloudfront_distribution.website_cloudfront.domain_name
+    zone_id                = aws_cloudfront_distribution.website_cloudfront.hosted_zone_id
     evaluate_target_health = false
   }
 }
@@ -165,7 +165,7 @@ resource "aws_cloudfront_distribution" "website_cloudfront" {
 
   origin {
     origin_id   = "only-origin"
-    domain_name = aws_s3_bucket.CdnContentBucket.bucket_domain_name
+    domain_name = aws_s3_bucket.cdn_content_bucket.bucket_domain_name
   }
 
   restrictions {

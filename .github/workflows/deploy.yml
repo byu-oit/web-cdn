@@ -94,7 +94,7 @@ jobs:
           node-version: ${{ env.node_version }}
 
       - name: Copy main-config.yml to /webhooks and /assembler
-        run: cp ./main-config.yml ./assembler/main-config.yml ./webhooks/main-config.yml
+        run: cp ./main-config.yml ./assembler/main-config.yml && cp ./main-config.yml ./webhooks/main-config.yml
 
       - name: Log into Amazon ECR
         id: login-ecr
