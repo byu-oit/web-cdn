@@ -15,9 +15,6 @@
     "url": "https://github.com/byu-oit/web-cdn/issues"
   },
   "homepage": "https://github.com/byu-oit/web-cdn",
-  "scripts": {
-    "install": "find ./node_modules/* -mtime +10950 -exec touch {} \\;"
-  },
   "devDependencies": {
     "lerna": "^6.0.0"
   }
