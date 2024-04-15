@@ -93,6 +93,14 @@ jobs:
         with:
           node-version: ${{ env.node_version }}
 
+      - name: npm install in enhanced-headers
+        working-directory:  edge-lambdas/enhanced-headers
+        run: npm ci --prefer-offline
+
+      - name: npm install in eager-redirect
+        working-directory: edge-lambdas/eager-redirect
+        run: npm ci --prefer-offline
+
       - name: Copy main-config.yml to /webhooks and /assembler
         run: cp ./main-config.yml ./assembler/main-config.yml && cp ./main-config.yml ./webhooks/main-config.yml
 
@@ -131,34 +139,6 @@ jobs:
           provenance: false
           push: true
           tags: ${{ env.ANALYZER_ECR_REGISTRY }}/${{ env.ANALYZER_ECR_REPO }}:${{ env.ANALYZER_IMAGE_TAG }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Build and push the Eager Redirect Docker image
-        env:
-          EAGER_REDIRECT_ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          EAGER_REDIRECT_ECR_REPO: ${{ matrix.env.eager_redirect_ecr_repo_name }}
-          EAGER_REDIRECT_IMAGE_TAG: ${{ steps.date.outputs.timestamp }}
-        uses: docker/build-push-action@v3
-        with:
-          context: edge-lambdas/eager-redirect
-          provenance: false
-          push: true
-          tags: ${{ env.EAGER_REDIRECT_ECR_REGISTRY }}/${{ env.EAGER_REDIRECT_ECR_REPO }}:${{ env.EAGER_REDIRECT_IMAGE_TAG }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Build and push the Enhanced Headers Docker image
-        env:
-          ENHANCED_HEADERS_ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ENHANCED_HEADERS_ECR_REPO: ${{ matrix.env.enhanced_headers_ecr_repo_name }}
-          ENHANCED_HEADERS_IMAGE_TAG: ${{ steps.date.outputs.timestamp }}
-        uses: docker/build-push-action@v3
-        with:
-          context: edge-lambdas/eager-redirect
-          provenance: false
-          push: true
-          tags: ${{ env.ENHANCED_HEADERS_ECR_REGISTRY }}/${{ env.ENHANCED_HEADERS_ECR_REPO }}:${{ env.ENHANCED_HEADERS_IMAGE_TAG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
