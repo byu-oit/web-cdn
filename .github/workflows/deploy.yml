@@ -168,7 +168,7 @@ jobs:
         with:
           context: webhooks
           push: true
-          tags: ${{ env.WEBHOOK_ECR_REGISTRY }}/${{ env.WEBHOOK_ECR_REPO }}:${{ env.WEBHOOK_IMAGE_TAG }}
+          tags: ${{ env.WEBHOOKS_ECR_REGISTRY }}/${{ env.WEBHOOKS_ECR_REPO }}:${{ env.WEBHOOKS_IMAGE_TAG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
