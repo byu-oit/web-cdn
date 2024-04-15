@@ -123,10 +123,14 @@ Additionally, these parts exist:
     - Called before going to the s3 bucket
     - This lambda is primarily responsible for redirecting aliases so that the calls don't need to 
       go to the s3 bucket first to redirect (which makes it faster).
+    - This Edge Lambda is deployed by zipping up the Lambda files instead of using Docker via ECR because
+      edge lambda's do not support being based on ECR images.
 - [Enhanced Headers Edge Lambda](edge-lambdas/enhanced-headers)
     - Called after going to the s3 bucket
     - Changes 301 redirects to 302 redirects
     - Takes S3 metadata and adds them as http headers
+    - This Edge Lambda is deployed by zipping up the Lambda files instead of using Docker via ECR because
+    edge lambda's do not support being based on ECR images.
 - The ["assembler"](assembler)
   - This deploys libraries into the CDN and all relevant metadata
   - There is a ["webhook" lambda](webhooks) function that is invoked via Github webhooks
