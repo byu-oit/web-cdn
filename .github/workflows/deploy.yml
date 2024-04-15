@@ -128,6 +128,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: log-analyzer/sorter-lambda
+          provenance: false
           push: true
           tags: ${{ env.ANALYZER_ECR_REGISTRY }}/${{ env.ANALYZER_ECR_REPO }}:${{ env.ANALYZER_IMAGE_TAG }}
           cache-from: type=gha
@@ -141,6 +142,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: edge-lambdas/eager-redirect
+          provenance: false
           push: true
           tags: ${{ env.EAGER_REDIRECT_ECR_REGISTRY }}/${{ env.EAGER_REDIRECT_ECR_REPO }}:${{ env.EAGER_REDIRECT_IMAGE_TAG }}
           cache-from: type=gha
@@ -154,6 +156,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: edge-lambdas/eager-redirect
+          provenance: false
           push: true
           tags: ${{ env.ENHANCED_HEADERS_ECR_REGISTRY }}/${{ env.ENHANCED_HEADERS_ECR_REPO }}:${{ env.ENHANCED_HEADERS_IMAGE_TAG }}
           cache-from: type=gha
@@ -167,6 +170,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: webhooks
+          provenance: false
           push: true
           tags: ${{ env.WEBHOOKS_ECR_REGISTRY }}/${{ env.WEBHOOKS_ECR_REPO }}:${{ env.WEBHOOKS_IMAGE_TAG }}
           cache-from: type=gha
