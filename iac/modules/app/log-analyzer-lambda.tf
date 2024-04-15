@@ -1,4 +1,3 @@
-
 resource "aws_lambda_function" "log_analyzer_sorter_func" {
   function_name = "${var.cdn_name}-${var.env}-LogAnalyzer-Sorter"
   role          = aws_iam_role.edge_lambda_execution_role.arn

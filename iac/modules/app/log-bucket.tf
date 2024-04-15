@@ -59,16 +59,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "log_bucket_config" {
   }
 }
 
-#resource "aws_s3_bucket_acl" "log_bucket" {
-#  depends_on = [
-#    aws_s3_bucket_ownership_controls.log_bucket,
-#    aws_s3_bucket_public_access_block.log_bucket,
-#  ]
-#
-#  bucket = aws_s3_bucket.LogBucket.id
-#  acl    = "log"
-#}
-
 resource "aws_s3_bucket_server_side_encryption_configuration" "logging_encryption" {
   bucket = aws_s3_bucket.log_bucket.id
   rule {

@@ -33,7 +33,7 @@ variable "min_ttl" {
 
 # ==================== HTTPS cert ====================
 #resource "aws_acm_certificate" "new_cert" {
-#  domain_name               = "${var.cdn_name}.${local.root_dns_name}" # TODO double-check domain name
+#  domain_name               = "${var.cdn_name}.${local.root_dns_name}" # TODO change when we use the real domain instead of the account domain
 #  validation_method         = "DNS"
 #  subject_alternative_names = ["*.${var.cdn_name}.${local.root_dns_name}"]
 #}
@@ -89,6 +89,43 @@ resource "aws_route53_record" "aaaa_record" {
 #   name    = "_3c077e2b2d1354f739d9880494eaec9b.byu-oit-fullstack-trn.amazon.byu.edu"
 #   type    = "CNAME"
 # }
+
+resource "aws_iam_policy" "allow_cdn_parameter_store_access" {
+  name        = "AllowCdnParameterStoreAccess"
+  description = "Allows access to CDN parameter store"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ssm:DescribeParameters",
+          "ssm:GetParameters"
+        ],
+        "Resource" : "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/${var.cdn_name}/*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "allow_cloudfront_invalidation" {
+  name        = "AllowCloudFrontInvalidation"
+  description = "Allows CloudFront invalidation"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "cloudfront:CreateInvalidation",
+          "cloudfront:GetInvalidation",
+          "cloudfront:ListInvalidations"
+        ],
+        "Resource" : "*"
+      }
+    ]
+  })
+}
 
 resource "aws_cloudfront_distribution" "website_cloudfront" {
   comment      = "${local.root_dns_name} - ${var.cdn_name} ${var.env}"

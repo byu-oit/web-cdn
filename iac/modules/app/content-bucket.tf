@@ -64,35 +64,6 @@ resource "random_string" "cf_key" {
   special = false
 }
 
-#data "aws_iam_policy_document" "static_website" {
-#  statement {
-#    sid       = "1"
-#    actions   = ["s3:ListBucket", "s3:PutBucketWebsite", "s3:Get*"]
-#    resources = [aws_s3_bucket.CdnContentBucket.arn]
-#
-#    principals {
-#      identifiers = ["*"]
-#      type        = "AWS"
-#    }
-#
-#    condition {
-#      test     = "StringLike"
-#      values   = [random_string.cf_key.result]
-#      variable = "aws:Referer"
-#    }
-#  }
-#  statement {
-#    sid       = "2"
-#    actions   = ["s3:*"]
-#    resources = ["${aws_s3_bucket.CdnContentBucket.arn}/*"]
-#
-#    principals {
-#      identifiers = ["*"]
-#      type        = "AWS"
-#    }
-#  }
-#}
-
 resource "aws_s3_bucket_public_access_block" "content_bucket" {
   bucket = aws_s3_bucket.cdn_content_bucket.id
 
@@ -110,16 +81,9 @@ resource "aws_s3_bucket_ownership_controls" "content_bucket" {
   }
 }
 
-#resource "aws_s3_bucket_policy" "cdn_bucket_read" {
-#  depends_on = [aws_s3_bucket_ownership_controls.content_bucket]
-#  bucket     = aws_s3_bucket.CdnContentBucket.id
-#  policy     = data.aws_iam_policy_document.static_website.json
-#}
-
 resource "aws_s3_bucket_acl" "content_bucket" {
   depends_on = [
-    aws_s3_bucket_ownership_controls.content_bucket,
-    #    aws_s3_bucket_public_access_block.content_bucket,
+    aws_s3_bucket_ownership_controls.content_bucket
   ]
 
   bucket = aws_s3_bucket.cdn_content_bucket.id
