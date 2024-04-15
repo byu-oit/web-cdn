@@ -49,12 +49,12 @@ resource "aws_iam_policy" "run_assembler" {
 }
 
 resource "aws_lambda_function" "WebhookFunc" {
-  function_name    = "${var.cdn_name}-webhooks-${var.env}"
-  role             = aws_iam_role.CdnBuildInvokerRole.arn
-  package_type     = "Image"
-  image_uri        = "${data.aws_ecr_repository.webhooks_repo.repository_url}:${var.image_tag}"
-  timeout          = 60
-  memory_size      = 128
+  function_name = "${var.cdn_name}-webhooks-${var.env}"
+  role          = aws_iam_role.CdnBuildInvokerRole.arn
+  package_type  = "Image"
+  image_uri     = "${data.aws_ecr_repository.webhooks_repo.repository_url}:${var.image_tag}"
+  timeout       = 60
+  memory_size   = 128
 
   environment {
     variables = {

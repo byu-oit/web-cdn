@@ -1,11 +1,11 @@
 resource "aws_lambda_function" "enhanced_headers_func" {
-  function_name    = "${var.cdn_name}-edge-enhanced-headers-${var.env}"
-  role             = aws_iam_role.EdgeLambdaExecutionRole.arn
-  package_type     = "Image"
-  image_uri        = "${data.aws_ecr_repository.enhanced_headers_ecr_repo.repository_url}:${var.image_tag}"
-  publish          = true
-  memory_size      = 128
-  timeout          = 20
+  function_name = "${var.cdn_name}-edge-enhanced-headers-${var.env}"
+  role          = aws_iam_role.EdgeLambdaExecutionRole.arn
+  package_type  = "Image"
+  image_uri     = "${data.aws_ecr_repository.enhanced_headers_ecr_repo.repository_url}:${var.image_tag}"
+  publish       = true
+  memory_size   = 128
+  timeout       = 20
 }
 
 # ==================== CloudWatch ====================

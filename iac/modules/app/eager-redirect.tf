@@ -1,11 +1,11 @@
 resource "aws_lambda_function" "eager_redirect_func" {
-  function_name    = "${var.cdn_name}-edge-eager-redirect-${var.env}"
-  role             = aws_iam_role.EdgeLambdaExecutionRole.arn
-  package_type     = "Image"
-  image_uri        = "${data.aws_ecr_repository.eager_redirect_ecr_repo.repository_url}:${var.image_tag}"
-  publish          = true
-  memory_size      = 512
-  timeout          = 20
+  function_name = "${var.cdn_name}-edge-eager-redirect-${var.env}"
+  role          = aws_iam_role.EdgeLambdaExecutionRole.arn
+  package_type  = "Image"
+  image_uri     = "${data.aws_ecr_repository.eager_redirect_ecr_repo.repository_url}:${var.image_tag}"
+  publish       = true
+  memory_size   = 512
+  timeout       = 20
 }
 
 # ==================== CloudWatch ====================

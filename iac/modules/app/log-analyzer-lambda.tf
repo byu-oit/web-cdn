@@ -1,12 +1,12 @@
 
 resource "aws_lambda_function" "LogAnalyzerSorterFunc" {
-  function_name    = "${var.cdn_name}-${var.env}-LogAnalyzer-Sorter"
-  role             = aws_iam_role.EdgeLambdaExecutionRole.arn
-  package_type     = "Image"
-  image_uri        = "${data.aws_ecr_repository.log_sorter_ecr_repo.repository_url}:${var.image_tag}"
-  publish          = true
-  timeout          = 20
-  memory_size      = 128
+  function_name = "${var.cdn_name}-${var.env}-LogAnalyzer-Sorter"
+  role          = aws_iam_role.EdgeLambdaExecutionRole.arn
+  package_type  = "Image"
+  image_uri     = "${data.aws_ecr_repository.log_sorter_ecr_repo.repository_url}:${var.image_tag}"
+  publish       = true
+  timeout       = 20
+  memory_size   = 128
 
   environment {
     variables = {
