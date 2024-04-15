@@ -81,9 +81,12 @@ jobs:
           aws-region: us-east-1
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ env.node_version }}
+
+      - name: npm install
+        run: npm ci --prefer-offline
 
       - name: Lerna Boostrap
         run: lerna bootstrap
