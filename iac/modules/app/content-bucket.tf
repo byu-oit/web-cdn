@@ -4,7 +4,7 @@ variable "s3_bucket_name" {
 }
 
 resource "aws_s3_bucket" "cdn_content_bucket" {
-  bucket = "${var.cdn_name}-${var.env}-contents-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}-temp"
+  bucket = "${var.cdn_name}-${var.env}-contents-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}"
 }
 
 resource "aws_s3_bucket_website_configuration" "cdn_content_bucket" {

@@ -1,6 +1,6 @@
 
 resource "aws_s3_bucket" "log_bucket" {
-  bucket        = "${var.cdn_name}-${var.env}-logs-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}-temp"
+  bucket        = "${var.cdn_name}-${var.env}-logs-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}"
   force_destroy = var.force_destroy
 }
 
