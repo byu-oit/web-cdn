@@ -6,10 +6,8 @@ RUN yum update -y
 # The lambda task root is where the source code should go
 WORKDIR $LAMBDA_TASK_ROOT
 
-COPY package*.json ./
+COPY . ./
 RUN npm ci
-
-COPY src ./
 
 RUN npm run build
 
