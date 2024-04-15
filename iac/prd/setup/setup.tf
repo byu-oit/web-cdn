@@ -36,6 +36,7 @@ provider "aws" {
 }
 
 module "setup" {
-  source = "../../modules/setup/"
-  env    = local.env
+  source   = "../../modules/setup/"
+  env      = local.env
+  cdn_name = "cdn-terraform"
 }

@@ -1,6 +1,3 @@
-#data "" {
-#  d
-#}
 
 variable "index_document_name" {
   type        = string
@@ -18,7 +15,6 @@ variable "site_url" {
   type        = string
   description = "The URL for the site."
 }
-
 
 variable "default_ttl" {
   type        = string
@@ -45,6 +41,7 @@ variable "min_ttl" {
 #  certificate_arn         = aws_acm_certificate.new_cert.arn
 #  validation_record_fqdns = [for record in aws_route53_record.new_cert_validation : record.fqdn]
 #}
+
 # ==================== Route53 ====================
 resource "aws_route53_record" "a_record" {
   name            = "${var.cdn_name}-${var.env}"
@@ -69,6 +66,7 @@ resource "aws_route53_record" "aaaa_record" {
     evaluate_target_health = false
   }
 }
+
 #resource "aws_route53_record" "new_cert_validation" {
 #  for_each = {
 #    for dvo in aws_acm_certificate.new_cert.domain_validation_options : dvo.domain_name => {
@@ -161,26 +159,13 @@ resource "aws_cloudfront_distribution" "WebsiteCloudfront" {
     prefix = local.unprocessed_log_prefix
   }
 
-  default_root_object = "index.html" # TODO: abstract to variables?
+  default_root_object = "index.html"
   price_class         = "PriceClass_100"
   is_ipv6_enabled     = true
 
   origin {
     origin_id   = "only-origin"
     domain_name = aws_s3_bucket.CdnContentBucket.bucket_domain_name
-
-    #    s3_origin_config {
-    #      origin_access_identity = ""
-    #    }
-
-    # TODO: why is this commented in the cloudbuild spec???
-    #    domain_name = aws_s3_bucket_website_configuration.CdnContentBucket.website_endpoint
-    #    custom_origin_config {
-    #      http_port              = "80"
-    #      https_port             = "443"
-    #      origin_protocol_policy = "http-only"
-    #      origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
-    #    }
   }
 
   restrictions {

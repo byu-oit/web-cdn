@@ -1,18 +1,9 @@
 
-# Log Sorter/Analyzer Lambda
-data "archive_file" "LogAnalyzerSorterFuncLambda" {
-  type        = "zip"
-  source_dir  = "../../../log-analyzer/sorter-lambda/"
-  output_path = "../../../log-analyzer/sorter-lambda.zip"
-}
-
 resource "aws_lambda_function" "LogAnalyzerSorterFunc" {
-  filename         = data.archive_file.LogAnalyzerSorterFuncLambda.output_path
   function_name    = "${var.cdn_name}-${var.env}-LogAnalyzer-Sorter"
   role             = aws_iam_role.EdgeLambdaExecutionRole.arn
-  handler          = "lib/lambda.handler"
-  runtime          = "nodejs16.x"
-  source_code_hash = base64sha256(data.archive_file.LogAnalyzerSorterFuncLambda.output_path)
+  package_type     = "Image"
+  image_uri        = "${data.aws_ecr_repository.log_sorter_ecr_repo.repository_url}:${var.image_tag}"
   publish          = true
   timeout          = 20
   memory_size      = 128

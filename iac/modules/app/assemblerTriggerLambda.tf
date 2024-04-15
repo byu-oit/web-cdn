@@ -1,10 +1,3 @@
-data "archive_file" "WebhookFuncLambda" {
-  type        = "zip"
-  source_dir  = "../../../webhooks/"
-  output_path = "../../../webhooks.zip"
-}
-
-# CdnBuildInvokerRole
 resource "aws_iam_role" "CdnBuildInvokerRole" {
   name = "CdnBuildInvokerRole"
   assume_role_policy = jsonencode({
@@ -56,12 +49,10 @@ resource "aws_iam_policy" "run_assembler" {
 }
 
 resource "aws_lambda_function" "WebhookFunc" {
-  filename         = data.archive_file.WebhookFuncLambda.output_path
   function_name    = "${var.cdn_name}-webhooks-${var.env}"
   role             = aws_iam_role.CdnBuildInvokerRole.arn
-  handler          = "lambda.handler"
-  runtime          = "nodejs16.x"
-  source_code_hash = base64sha256(data.archive_file.WebhookFuncLambda.output_path)
+  package_type     = "Image"
+  image_uri        = "${data.aws_ecr_repository.webhooks_repo.repository_url}:${var.image_tag}"
   timeout          = 60
   memory_size      = 128
 
@@ -77,7 +68,6 @@ resource "aws_lambda_function" "WebhookFunc" {
   }
 }
 
-# WebhookDomain
 resource "aws_api_gateway_rest_api" "WebHookDomain" {
   name        = "webhook-domain-gateway"
   description = "CDN WebhookDomain API Gateway"
