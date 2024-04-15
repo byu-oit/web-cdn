@@ -89,7 +89,7 @@ jobs:
         run: lerna bootstrap
 
       - name: Copy main-config.yml to /webhooks and /assembler
-        uses: cp ./main-config.yml ./assembler ./webhooks
+        run: cp ./main-config.yml ./assembler ./webhooks
 
       - name: Log into Amazon ECR
         id: login-ecr
