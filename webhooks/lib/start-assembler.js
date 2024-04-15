@@ -41,7 +41,7 @@ module.exports = async function startAssembler(options) {
 
   try {
     const taskResult = await ecs.runTask(params)
-    console.log(`Task Result: ${taskResult}`)
+    console.log(`Task Result: ${JSON.stringify(taskResult)}`, null, 2)
   } catch (err) {
     throw new Error(`Something went wrong while starting assembler task with params: ${JSON.stringify(params, null, 2)}, error:, ${err.message}`)
   }
