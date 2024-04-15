@@ -8,7 +8,7 @@ module "assembler" {
   primary_container_definition = {
     name  = "${var.cdn_name}-${var.env}-assembler"
     image = "${data.aws_ecr_repository.assembler_ecr_repo.repository_url}:${var.image_tag}" # FIXME: should name be used?
-    environment_variables = {                                                               # TODO: Fill in missing refs
+    environment_variables = {
       "DESTINATION_S3_BUCKET" = aws_s3_bucket_website_configuration.CdnContentBucket.id,
       "BUILD_ENV"             = var.env,
       "CDN_HOST"              = "${var.cdn_name}-${var.env}.${local.root_dns_name}",

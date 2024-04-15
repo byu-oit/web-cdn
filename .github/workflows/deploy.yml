@@ -27,7 +27,11 @@ jobs:
                 "rfc_key_name":"standard_change_sandbox_client_key",
                 "rfc_secret_name":"standard_change_sandbox_client_secret",
                 "rfc_template_id":"Codepipeline-Standard-Change",
-                "assembler_ecr_repo_name" : "cdn-terraform-assembler",
+                "assembler_ecr_repo_name" : "cdn-terraform-assembler-dev",
+                "eager_redirect_ecr_repo_name" : "cdn-terraform-eager-redirect-dev",
+                "webhooks_ecr_repo_name" : "cdn-terraform-webhooks-dev",
+                "enhanced_headers_ecr_repo_name" : "cdn-terraform-enhanced-headers-dev",
+                "log_sorter_ecr_repo_name" : "cdn-terraform-log-sorter-dev",
                 "tf_working_dir":"./iac/dev/app"
               }
             ]
@@ -46,7 +50,11 @@ jobs:
                 "rfc_key_name":"standard_change_production_client_key",
                 "rfc_secret_name":"standard_change_production_client_secret",
                 "rfc_template_id":"Codepipeline-Standard-Change",
-                "assembler_ecr_repo_name": "web-cdn-prd-assembler",
+                "assembler_ecr_repo_name" : "cdn-terraform-assembler-prd",
+                "eager_redirect_ecr_repo_name" : "cdn-terraform-eager-redirect-prd",
+                "webhooks_ecr_repo_name" : "cdn-terraform-webhooks-dev",
+                "enhanced_headers_ecr_repo_name" : "cdn-terraform-enhanced-headers-prd",
+                "log_sorter_ecr_repo_name" : "cdn-terraform-log-sorter-prd"
                 "tf_working_dir":"./iac/prd/app"
               }
             ]
@@ -85,12 +93,6 @@ jobs:
         with:
           node-version: ${{ env.node_version }}
 
-      - name: npm install
-        run: npm install --include dev
-
-      - name: Lerna Boostrap
-        run: lerna bootstrap
-
       - name: Copy main-config.yml to /webhooks and /assembler
         run: cp ./main-config.yml ./assembler ./webhooks
 
@@ -107,14 +109,66 @@ jobs:
 
       - name: Build and push the Assembler Docker image
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPO: ${{ matrix.env.assembler_ecr_repo_name }}
-          IMAGE_TAG: ${{ steps.date.outputs.timestamp }}
+          ASSEMBLER_ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ASSEMBLER_ECR_REPO: ${{ matrix.env.assembler_ecr_repo_name }}
+          ASSEMBLER_IMAGE_TAG: ${{ steps.date.outputs.timestamp }}
         uses: docker/build-push-action@v3
         with:
           context: assembler
           push: true
-          tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO}}:${{ env.IMAGE_TAG }}
+          tags: ${{ env.ASSEMBLER_ECR_REGISTRY }}/${{ env.ASSEMBLER_ECR_REPO }}:${{ env.ASSEMBLER_IMAGE_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push the Log Sorter Docker image
+        env:
+          ANALYZER_ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ANALYZER_ECR_REPO: ${{ matrix.env.log_sorter_ecr_repo_name }}
+          ANALYZER_IMAGE_TAG: ${{ steps.date.outputs.timestamp }}
+        uses: docker/build-push-action@v3
+        with:
+          context: log-analyzer/sorter-lambda
+          push: true
+          tags: ${{ env.ANALYZER_ECR_REGISTRY }}/${{ env.ANALYZER_ECR_REPO }}:${{ env.ANALYZER_IMAGE_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push the Eager Redirect Docker image
+        env:
+          EAGER_REDIRECT_ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          EAGER_REDIRECT_ECR_REPO: ${{ matrix.env.eager_redirect_ecr_repo_name }}
+          EAGER_REDIRECT_IMAGE_TAG: ${{ steps.date.outputs.timestamp }}
+        uses: docker/build-push-action@v3
+        with:
+          context: edge-lambdas/eager-redirect
+          push: true
+          tags: ${{ env.EAGER_REDIRECT_ECR_REGISTRY }}/${{ env.EAGER_REDIRECT_ECR_REPO }}:${{ env.EAGER_REDIRECT_IMAGE_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push the Enhanced Headers Docker image
+        env:
+          ENHANCED_HEADERS_ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ENHANCED_HEADERS_ECR_REPO: ${{ matrix.env.enhanced_headers_ecr_repo_name }}
+          ENHANCED_HEADERS_IMAGE_TAG: ${{ steps.date.outputs.timestamp }}
+        uses: docker/build-push-action@v3
+        with:
+          context: edge-lambdas/eager-redirect
+          push: true
+          tags: ${{ env.ENHANCED_HEADERS_ECR_REGISTRY }}/${{ env.ENHANCED_HEADERS_ECR_REPO }}:${{ env.ENHANCED_HEADERS_IMAGE_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push the Webhook Docker image
+        env:
+          WEBHOOKS_ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          WEBHOOKS_ECR_REPO: ${{ matrix.env.webhooks_ecr_repo_name }}
+          WEBHOOKS_IMAGE_TAG: ${{ steps.date.outputs.timestamp }}
+        uses: docker/build-push-action@v3
+        with:
+          context: webhooks
+          push: true
+          tags: ${{ env.WEBHOOK_ECR_REGISTRY }}/${{ env.WEBHOOK_ECR_REPO }}:${{ env.WEBHOOK_IMAGE_TAG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

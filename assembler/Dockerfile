@@ -12,7 +12,7 @@ RUN mkdir -p /usr/src/assembler
 
 WORKDIR /usr/src/assembler
 
-ADD package.json yarn.lock ./
+ADD package*.json ./
 
 RUN yarn install --production \
     && yarn cache clean

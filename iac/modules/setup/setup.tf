@@ -28,13 +28,13 @@ module "gha_role" {
   oidc_subjects_with_wildcards   = ["repo:${local.gh_org}/${local.gh_repo}:*"]
 }
 
-# AssemblerRepository
 module "my_ecr" {
-  source = "github.com/byu-oit/terraform-aws-ecr?ref=v2.0.1"
-  name   = "${var.cdn_name}-assembler"
+  for_each = toset(["assembler", "log-sorter", "webhooks", "eager-redirect", "enhanced-headers"])
+  source   = "github.com/byu-oit/terraform-aws-ecr?ref=v2.0.1"
+  name     = "${var.cdn_name}-${each.key}-${var.env}"
 }
 
-# SSM parameters
+# ==================== SSM Parameters ====================
 
 resource "aws_ssm_parameter" "secrets" {
   for_each = {
