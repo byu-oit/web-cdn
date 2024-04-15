@@ -9,7 +9,5 @@ WORKDIR $LAMBDA_TASK_ROOT
 COPY . ./
 RUN npm ci --omit=dev
 
-
-
 ENV NODE_ENV='production'
 CMD [ "lambda.handler" ]

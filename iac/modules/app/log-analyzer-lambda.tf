@@ -1,7 +1,7 @@
 
-resource "aws_lambda_function" "LogAnalyzerSorterFunc" {
+resource "aws_lambda_function" "log_analyzer_sorter_func" {
   function_name = "${var.cdn_name}-${var.env}-LogAnalyzer-Sorter"
-  role          = aws_iam_role.EdgeLambdaExecutionRole.arn
+  role          = aws_iam_role.edge_lambda_execution_role.arn
   package_type  = "Image"
   image_uri     = "${data.aws_ecr_repository.log_sorter_ecr_repo.repository_url}:${var.image_tag}"
   publish       = true
@@ -11,7 +11,7 @@ resource "aws_lambda_function" "LogAnalyzerSorterFunc" {
   environment {
     variables = {
       TZ : "America/Denver"
-      LOG_BUCKET : aws_s3_bucket.LogBucket.id
+      LOG_BUCKET : aws_s3_bucket.log_bucket.id
       UNPROCESSED_PREFIX : local.unprocessed_log_prefix
       PREPROCESSED_PREFIX : local.preprocessed_log_prefix
     }
@@ -23,20 +23,20 @@ resource "aws_lambda_function" "LogAnalyzerSorterFunc" {
 resource "aws_lambda_permission" "LogAnalyzerSorterTriggerPermission" {
   statement_id  = "LogAnalyzerSorterTriggerPermission"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.LogAnalyzerSorterFunc.function_name
+  function_name = aws_lambda_function.log_analyzer_sorter_func.function_name
   principal     = "s3.amazonaws.com"
   #   principal  = data.aws_caller_identity.current.account_id # TODO figure this out
-  source_arn = aws_s3_bucket.LogBucket.arn
+  source_arn = aws_s3_bucket.log_bucket.arn
 }
 
 resource "aws_s3_bucket_notification" "LogAnalyzerSorterFuncTrigger" {
-  bucket = aws_s3_bucket.LogBucket.id
+  bucket = aws_s3_bucket.log_bucket.id
 
   lambda_function {
-    lambda_function_arn = aws_lambda_function.LogAnalyzerSorterFunc.arn
+    lambda_function_arn = aws_lambda_function.log_analyzer_sorter_func.arn
     events              = ["s3:ObjectCreated:*"]
     filter_prefix       = local.unprocessed_log_prefix
   }
 
-  depends_on = [aws_lambda_permission.LogAnalyzerSorterTriggerPermission, aws_s3_bucket.LogBucket]
+  depends_on = [aws_lambda_permission.LogAnalyzerSorterTriggerPermission, aws_s3_bucket.log_bucket]
 }

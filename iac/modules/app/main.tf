@@ -2,7 +2,7 @@ module "acs" {
   source = "github.com/byu-oit/terraform-aws-acs-info?ref=v3.5.0"
 }
 
-resource "aws_iam_policy" "AllowCdnParameterStoreAccess" {
+resource "aws_iam_policy" "allow_cdn_parameter_store_access" {
   name        = "AllowCdnParameterStoreAccess"
   description = "Allows access to CDN parameter store"
   policy = jsonencode({
@@ -20,7 +20,7 @@ resource "aws_iam_policy" "AllowCdnParameterStoreAccess" {
   })
 }
 
-resource "aws_iam_policy" "AllowCloudFrontInvalidation" {
+resource "aws_iam_policy" "allow_cloudfront_invalidation" {
   name        = "AllowCloudFrontInvalidation"
   description = "Allows CloudFront invalidation"
   policy = jsonencode({
@@ -60,7 +60,7 @@ data "aws_ecr_repository" "log_sorter_ecr_repo" {
 }
 
 
-resource "aws_iam_policy" "AllowAssemblerImageAccess" {
+resource "aws_iam_policy" "allow_assembler_image_access" {
   name        = "AllowAssemblerImageAccess"
   description = "Allows access to Assembler images"
   policy = jsonencode({
@@ -85,7 +85,7 @@ resource "aws_iam_policy" "AllowAssemblerImageAccess" {
 }
 
 # EdgeLambdaExecutionRole
-resource "aws_iam_role" "EdgeLambdaExecutionRole" {
+resource "aws_iam_role" "edge_lambda_execution_role" {
   name                 = "EdgeLambdaExecutionRole"
   path                 = "/${var.cdn_name}/"
   permissions_boundary = module.acs.role_permissions_boundary.arn
