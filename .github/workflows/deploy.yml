@@ -86,7 +86,7 @@ jobs:
           node-version: ${{ env.node_version }}
 
       - name: npm install
-        run: npm ci --prefer-offline
+        run: npm install --include dev
 
       - name: Lerna Boostrap
         run: lerna bootstrap
