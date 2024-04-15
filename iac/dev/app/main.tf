@@ -26,6 +26,7 @@ locals {
   env           = "dev"
   cdn_name      = "cdn-terraform"
   config_branch = "terraform" //TODO: change me
+  stage_name    = "dev"
 }
 
 provider "aws" {
@@ -55,4 +56,5 @@ module "app" {
   min_ttl             = 0
   force_destroy       = true
   config_branch       = local.config_branch
+  stage_name          = local.stage_name
 }
