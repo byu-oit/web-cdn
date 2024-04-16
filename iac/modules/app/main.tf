@@ -10,14 +10,6 @@ data "aws_ecr_repository" "webhooks_repo" {
   name = "${var.cdn_name}-webhooks-${var.env}"
 }
 
-data "aws_ecr_repository" "eager_redirect_ecr_repo" {
-  name = "${var.cdn_name}-eager-redirect-${var.env}"
-}
-
-data "aws_ecr_repository" "enhanced_headers_ecr_repo" {
-  name = "${var.cdn_name}-enhanced-headers-${var.env}"
-}
-
 data "aws_ecr_repository" "log_sorter_ecr_repo" {
   name = "${var.cdn_name}-log-sorter-${var.env}"
 }

@@ -29,7 +29,7 @@ module "gha_role" {
 }
 
 module "my_ecr" {
-  for_each = toset(["assembler", "log-sorter", "webhooks", "eager-redirect", "enhanced-headers"])
+  for_each = toset(["assembler", "log-sorter", "webhooks"])
   source   = "github.com/byu-oit/terraform-aws-ecr?ref=v2.0.1"
   name     = "${var.cdn_name}-${each.key}-${var.env}"
 }

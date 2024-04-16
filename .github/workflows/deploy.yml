@@ -28,9 +28,7 @@ jobs:
                 "rfc_secret_name":"standard_change_sandbox_client_secret",
                 "rfc_template_id":"Codepipeline-Standard-Change",
                 "assembler_ecr_repo_name" : "cdn-terraform-assembler-dev",
-                "eager_redirect_ecr_repo_name" : "cdn-terraform-eager-redirect-dev",
                 "webhooks_ecr_repo_name" : "cdn-terraform-webhooks-dev",
-                "enhanced_headers_ecr_repo_name" : "cdn-terraform-enhanced-headers-dev",
                 "log_sorter_ecr_repo_name" : "cdn-terraform-log-sorter-dev",
                 "tf_working_dir":"./iac/dev/app"
               }
@@ -51,9 +49,7 @@ jobs:
                 "rfc_secret_name":"standard_change_production_client_secret",
                 "rfc_template_id":"Codepipeline-Standard-Change",
                 "assembler_ecr_repo_name" : "cdn-terraform-assembler-prd",
-                "eager_redirect_ecr_repo_name" : "cdn-terraform-eager-redirect-prd",
                 "webhooks_ecr_repo_name" : "cdn-terraform-webhooks-dev",
-                "enhanced_headers_ecr_repo_name" : "cdn-terraform-enhanced-headers-prd",
                 "log_sorter_ecr_repo_name" : "cdn-terraform-log-sorter-prd"
                 "tf_working_dir":"./iac/prd/app"
               }
