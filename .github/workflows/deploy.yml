@@ -22,7 +22,7 @@ jobs:
           matrix='{
             "env":[
               {
-                "aws_account":"863362256468",
+                "aws_account":"632558792265",
                 "aws_gha_role":"web-cdn-dev-gha",
                 "rfc_key_name":"standard_change_sandbox_client_key",
                 "rfc_secret_name":"standard_change_sandbox_client_secret",
