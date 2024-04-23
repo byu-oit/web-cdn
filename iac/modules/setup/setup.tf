@@ -24,7 +24,7 @@ module "gha_role" {
   version                        = "5.17.0"
   create_role                    = true
   role_name                      = "${var.name}-${var.env}-gha"
-  provider_url                   =  "token.actions.githubusercontent.com/brigham-young-university" # TODO: Fix this hardcode
+  provider_url                   = "token.actions.githubusercontent.com/brigham-young-university" # TODO: Fix this hardcode
   role_permissions_boundary_arn  = module.acs.role_permissions_boundary.arn
   role_policy_arns               = module.acs.power_builder_policies[*].arn
   oidc_fully_qualified_audiences = ["sts.amazonaws.com"]

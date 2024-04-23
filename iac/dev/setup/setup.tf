@@ -36,8 +36,8 @@ provider "aws" {
 }
 
 module "setup" {
-  source   = "../../modules/setup/"
-  env      = local.env
-  name     = "web-cdn"
-  cdn_url  = "cdn-dev.byu.edu"
+  source  = "../../modules/setup/"
+  env     = local.env
+  name    = "web-cdn"
+  cdn_url = "cdn-dev.byu.edu"
 }
