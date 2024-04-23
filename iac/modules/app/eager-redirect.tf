@@ -1,3 +1,25 @@
+# EdgeLambdaExecutionRole
+resource "aws_iam_role" "edge_lambda_execution_role" {
+  name                 = "EdgeLambdaExecutionRole"
+  path                 = "/${var.name}/"
+  permissions_boundary = module.acs.role_permissions_boundary.arn
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : ["lambda.amazonaws.com", "edgelambda.amazonaws.com"]
+        },
+        "Action" : "sts:AssumeRole"
+      }
+    ]
+  })
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+  ]
+}
+
 data "archive_file" "eager_redirect_func" {
   type        = "zip"
   source_dir  = "../../../edge-lambdas/eager-redirect"
@@ -5,7 +27,7 @@ data "archive_file" "eager_redirect_func" {
 }
 
 resource "aws_lambda_function" "eager_redirect_func" {
-  function_name    = "${var.cdn_name}-edge-eager-redirect-${var.env}"
+  function_name    = "${local.app_name}-edge-eager-redirect"
   filename         = data.archive_file.eager_redirect_func.output_path
   handler          = "index.handler"
   runtime          = "nodejs16.x"
@@ -15,8 +37,8 @@ resource "aws_lambda_function" "eager_redirect_func" {
   publish          = true
   source_code_hash = data.archive_file.eager_redirect_func.output_base64sha256 # forces terraform to push the zip files when they change
 }
-# ==================== CloudWatch ====================
 
+# ==================== CloudWatch ====================
 resource "aws_cloudwatch_log_group" "eager_redirect_log_group" {
   name              = "/aws/lambda/${aws_lambda_function.eager_redirect_func.function_name}"
   retention_in_days = 14

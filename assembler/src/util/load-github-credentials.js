@@ -57,27 +57,3 @@ async function fromLocalFile() {
 function fromEnvironment() {
   return {user: process.env.GITHUB_USER, token: process.env.GITHUB_TOKEN};
 }
-
-async function fromParameterStore(env) {
-    let prefix = `cdn-terraform/${env}`;
-    let userParam = `${prefix}/github.user`;
-    let tokenParam = `${prefix}/github.token`;
-
-    let data = await ssm.getParameters({
-        Names: [
-            userParam, tokenParam
-        ],
-        WithDecryption: true
-    }).promise();
-
-    let invalid = data.InvalidParameters;
-    if (invalid && invalid.length > 0) {
-        log.warn(`Unable to look up Github credentials from AWS SSM: Invalid Parameters ${invalid.join(', ')}`);
-        return null;
-    }
-
-    let user = data.Parameters.find(val => val.Name === userParam);
-    let token = data.Parameters.find(val => val.Name === tokenParam);
-
-    return {user: user.Value, token: token.Value};
-}

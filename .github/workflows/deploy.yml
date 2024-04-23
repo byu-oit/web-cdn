@@ -22,14 +22,14 @@ jobs:
           matrix='{
             "env":[
               {
-                "aws_account":"632558792265",
+                "aws_account":"637423550675",
                 "aws_gha_role":"web-cdn-dev-gha",
                 "rfc_key_name":"standard_change_sandbox_client_key",
                 "rfc_secret_name":"standard_change_sandbox_client_secret",
                 "rfc_template_id":"Codepipeline-Standard-Change",
-                "assembler_ecr_repo_name" : "cdn-terraform-assembler-dev",
-                "webhooks_ecr_repo_name" : "cdn-terraform-webhooks-dev",
-                "log_sorter_ecr_repo_name" : "cdn-terraform-log-sorter-dev",
+                "assembler_ecr_repo_name" : "web-cdn-dev-terraform-assembler-dev",
+                "webhooks_ecr_repo_name" : "web-cdn-dev-terraform-webhooks-dev",
+                "log_sorter_ecr_repo_name" : "web-cdn-dev-terraform-log-sorter",
                 "tf_working_dir":"./iac/dev/app"
               }
             ]
@@ -48,9 +48,9 @@ jobs:
                 "rfc_key_name":"standard_change_production_client_key",
                 "rfc_secret_name":"standard_change_production_client_secret",
                 "rfc_template_id":"Codepipeline-Standard-Change",
-                "assembler_ecr_repo_name" : "cdn-terraform-assembler-prd",
-                "webhooks_ecr_repo_name" : "cdn-terraform-webhooks-dev",
-                "log_sorter_ecr_repo_name" : "cdn-terraform-log-sorter-prd"
+                "assembler_ecr_repo_name" : "web-cdn-dev-terraform-assembler-prd",
+                "webhooks_ecr_repo_name" : "web-cdn-dev-terraform-webhooks-dev",
+                "log_sorter_ecr_repo_name" : "web-cdn-dev-terraform-log-sorter-prd"
                 "tf_working_dir":"./iac/prd/app"
               }
             ]
@@ -89,14 +89,22 @@ jobs:
         with:
           node-version: ${{ env.node_version }}
 
+      # this is necessary because Lambda@Edge functions cannot be pulled from AWS ECR, so we cannot use a Dockerfile to deploy :(
+      # this step installs the node_modules for the lambda, the terraform apply zips it up
+      # see https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-at-edge-function-restrictions.html
       - name: npm install in enhanced-headers
         working-directory:  edge-lambdas/enhanced-headers
         run: npm ci --prefer-offline
 
+      # this is necessary because Lambda@Edge functions cannot be pulled from AWS ECR, so we cannot use a Dockerfile to deploy :(
+      # this step installs the node_modules for the lambda, the terraform apply zips it up
+      # see https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-at-edge-function-restrictions.html
       - name: npm install in eager-redirect
         working-directory: edge-lambdas/eager-redirect
         run: npm ci --prefer-offline
 
+      # both the webhook (assembler trigger) lambda and the assembler need this file, but in order to keep the context of our docker builds simple, we copy it into both places here
+      # a better implementation of the webhook lambda might not need the main-config.yml file if we authenticated the github repos calling the lambda in a better way, but that is beyond the scope of the current work
       - name: Copy main-config.yml to /webhooks and /assembler
         run: cp ./main-config.yml ./assembler/main-config.yml && cp ./main-config.yml ./webhooks/main-config.yml
 
@@ -132,7 +140,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: log-analyzer/sorter-lambda
-          provenance: false
+          provenance: false  # see https://github.com/orgs/byu-oit/discussions/56
           push: true
           tags: ${{ env.ANALYZER_ECR_REGISTRY }}/${{ env.ANALYZER_ECR_REPO }}:${{ env.ANALYZER_IMAGE_TAG }}
           cache-from: type=gha
@@ -146,7 +154,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: webhooks
-          provenance: false
+          provenance: false # see https://github.com/orgs/byu-oit/discussions/56
           push: true
           tags: ${{ env.WEBHOOKS_ECR_REGISTRY }}/${{ env.WEBHOOKS_ECR_REPO }}:${{ env.WEBHOOKS_IMAGE_TAG }}
           cache-from: type=gha

@@ -1,5 +1,5 @@
 resource "aws_lambda_function" "log_analyzer_sorter_func" {
-  function_name = "${var.cdn_name}-${var.env}-LogAnalyzer-Sorter"
+  function_name = "${local.app_name}-LogAnalyzer-Sorter"
   role          = aws_iam_role.edge_lambda_execution_role.arn
   package_type  = "Image"
   image_uri     = "${data.aws_ecr_repository.log_sorter_ecr_repo.repository_url}:${var.image_tag}"

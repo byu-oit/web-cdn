@@ -1,8 +1,8 @@
 terraform {
   required_version = "1.4.5"
   backend "s3" {
-    bucket         = "terraform-state-storage-204581410681"
-    dynamodb_table = "terraform-state-lock-204581410681"
+    bucket         = "terraform-state-storage-891377162314"
+    dynamodb_table = "terraform-state-lock-891377162314"
     key            = "web-cdn/dev/app.tfstate"
     region         = "us-west-2"
   }
@@ -24,7 +24,7 @@ variable "image_tag" {
 
 locals {
   env           = "prd"
-  cdn_name      = "cdn-terraform"
+  name          = "web-cdn "
   config_branch = "terraform" //TODO: change me
   stage_name    = "prd"
 }
@@ -45,7 +45,7 @@ provider "aws" {
 module "app" {
   source              = "../../modules/app/"
   env                 = local.env
-  cdn_name            = local.cdn_name
+  name                = local.name
   image_tag           = var.image_tag
   s3_bucket_name      = "${local.cdn_name}-${local.env}-contents"
   index_document_name = "index.html"

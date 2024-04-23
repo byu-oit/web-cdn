@@ -1,8 +1,8 @@
 terraform {
   required_version = "1.4.5"
   backend "s3" {
-    bucket         = "terraform-state-storage-204581410681"
-    dynamodb_table = "terraform-state-lock-204581410681"
+    bucket         = "terraform-state-storage-891377162314"
+    dynamodb_table = "terraform-state-lock-891377162314"
     key            = "web-cdn/prd/setup.tfstate"
     region         = "us-west-2"
   }

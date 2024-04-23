@@ -1,8 +1,8 @@
 terraform {
   required_version = "1.4.5"
   backend "s3" {
-    bucket         = "terraform-state-storage-632558792265"
-    dynamodb_table = "terraform-state-lock-632558792265"
+    bucket         = "terraform-state-storage-637423550675"
+    dynamodb_table = "terraform-state-lock-637423550675"
     key            = "web-cdn/dev/setup.tfstate"
     region         = "us-west-2"
   }
@@ -38,5 +38,6 @@ provider "aws" {
 module "setup" {
   source   = "../../modules/setup/"
   env      = local.env
-  cdn_name = "cdn-terraform"
+  name     = "web-cdn"
+  cdn_url  = "cdn-dev.byu.edu"
 }

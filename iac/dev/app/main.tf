@@ -1,8 +1,8 @@
 terraform {
   required_version = "1.4.5"
   backend "s3" {
-    bucket         = "terraform-state-storage-632558792265"
-    dynamodb_table = "terraform-state-lock-632558792265"
+    bucket         = "terraform-state-storage-637423550675"
+    dynamodb_table = "terraform-state-lock-637423550675"
     key            = "web-cdn/dev/app.tfstate"
     region         = "us-west-2"
   }
@@ -24,8 +24,8 @@ variable "image_tag" {
 
 locals {
   env           = "dev"
-  cdn_name      = "cdn-terraform"
-  config_branch = "terraform" //TODO: change me
+  name          = "web-cdn"
+  config_branch = "terraform" //TODO: change me to dev when we cutover
   stage_name    = "dev"
 }
 
@@ -45,16 +45,15 @@ provider "aws" {
 module "app" {
   source              = "../../modules/app/"
   env                 = local.env
-  cdn_name            = local.cdn_name
+  name                = local.name
   image_tag           = var.image_tag
-  s3_bucket_name      = "${local.cdn_name}-${local.env}-contents"
   index_document_name = "index.html"
   error_document_name = "error.html"
-  site_url            = "https://${local.cdn_name}.byu-oit-fullstack-trn.amazon.byu.edu"
   default_ttl         = 30
   max_ttl             = 60
   min_ttl             = 0
   force_destroy       = true
   config_branch       = local.config_branch
   stage_name          = local.stage_name
+  cdn_url             = "byu-oit-cdn-dev.amazon.byu.edu"
 }

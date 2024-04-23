@@ -5,7 +5,7 @@ data "archive_file" "enhanced_header_func" {
 }
 
 resource "aws_lambda_function" "enhanced_headers_func" {
-  function_name    = "${var.cdn_name}-edge-enhanced-headers-${var.env}"
+  function_name    = "${local.app_name}-edge-enhanced-headers"
   filename         = data.archive_file.enhanced_header_func.output_path
   handler          = "index.handler"
   runtime          = "nodejs16.x"
@@ -17,7 +17,6 @@ resource "aws_lambda_function" "enhanced_headers_func" {
 }
 
 # ==================== CloudWatch ====================
-
 resource "aws_cloudwatch_log_group" "enhanced_headers_log_group" {
   name              = "/aws/lambda/${aws_lambda_function.enhanced_headers_func.function_name}"
   retention_in_days = 14

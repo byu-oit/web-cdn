@@ -12,7 +12,7 @@ resource "aws_iam_role" "cdn_build_invoker_role" {
       },
     ]
   })
-  path                 = "/${var.cdn_name}/"
+  path                 = "/${var.name}/"
   permissions_boundary = module.acs.role_permissions_boundary.arn
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
@@ -49,7 +49,7 @@ resource "aws_iam_policy" "run_assembler" {
 }
 
 resource "aws_lambda_function" "webhook_func" {
-  function_name = "${var.cdn_name}-webhooks-${var.env}"
+  function_name = "${local.app_name}-webhooks"
   role          = aws_iam_role.cdn_build_invoker_role.arn
   package_type  = "Image"
   image_uri     = "${data.aws_ecr_repository.webhooks_repo.repository_url}:${var.image_tag}"
@@ -76,7 +76,7 @@ resource "aws_api_gateway_rest_api" "webhook_domain" {
 # TODO: change when we deploy to the real domain
 resource "aws_api_gateway_domain_name" "webhook_domain" {
   certificate_arn = module.acs.certificate_virginia.arn
-  domain_name     = "webhooks.${local.root_dns_name}"
+  domain_name     = "webhooks.${var.cdn_url}"
   security_policy = "TLS_1_0"
 }
 
@@ -122,7 +122,7 @@ resource "aws_api_gateway_deployment" "deployment" {
 resource "aws_route53_record" "webhooks_a_record" {
   name            = "webhooks"
   type            = "A"
-  zone_id         = local.root_dns_id
+  zone_id         = data.aws_route53_zone.cdn_zone.id
   allow_overwrite = false
   alias {
     name                   = aws_api_gateway_domain_name.webhook_domain.cloudfront_domain_name
@@ -134,7 +134,7 @@ resource "aws_route53_record" "webhooks_a_record" {
 resource "aws_route53_record" "webhooks_aaaa_record" {
   name            = "webhooks"
   type            = "AAAA"
-  zone_id         = local.root_dns_id
+  zone_id         = data.aws_route53_zone.cdn_zone.id
   allow_overwrite = false
   alias {
     name                   = aws_api_gateway_domain_name.webhook_domain.cloudfront_domain_name

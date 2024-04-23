@@ -1,10 +1,5 @@
-
-variable "s3_bucket_name" {
-  description = "Name of S3 bucket for website"
-}
-
 resource "aws_s3_bucket" "cdn_content_bucket" {
-  bucket = "${var.cdn_name}-${var.env}-contents-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}"
+  bucket = "${local.app_name}-contents"
 }
 
 resource "aws_s3_bucket_website_configuration" "cdn_content_bucket" {
