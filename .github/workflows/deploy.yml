@@ -27,8 +27,8 @@ jobs:
                 "rfc_key_name":"standard_change_sandbox_client_key",
                 "rfc_secret_name":"standard_change_sandbox_client_secret",
                 "rfc_template_id":"Codepipeline-Standard-Change",
-                "assembler_ecr_repo_name" : "web-cdn-dev-terraform-assembler-dev",
-                "webhooks_ecr_repo_name" : "web-cdn-dev-terraform-webhooks-dev",
+                "assembler_ecr_repo_name" : "web-cdn-dev-terraform-assembler",
+                "webhooks_ecr_repo_name" : "web-cdn-dev-terraform-webhooks",
                 "log_sorter_ecr_repo_name" : "web-cdn-dev-terraform-log-sorter",
                 "tf_working_dir":"./iac/dev/app"
               }
@@ -48,9 +48,9 @@ jobs:
                 "rfc_key_name":"standard_change_production_client_key",
                 "rfc_secret_name":"standard_change_production_client_secret",
                 "rfc_template_id":"Codepipeline-Standard-Change",
-                "assembler_ecr_repo_name" : "web-cdn-dev-terraform-assembler-prd",
-                "webhooks_ecr_repo_name" : "web-cdn-dev-terraform-webhooks-dev",
-                "log_sorter_ecr_repo_name" : "web-cdn-dev-terraform-log-sorter-prd"
+                "assembler_ecr_repo_name" : "web-cdn-prd-terraform-assembler",
+                "webhooks_ecr_repo_name" : "web-cdn-prd-terraform-webhooks",
+                "log_sorter_ecr_repo_name" : "web-cdn-prd-terraform-log-sorter"
                 "tf_working_dir":"./iac/prd/app"
               }
             ]
