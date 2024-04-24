@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "cdn_content_bucket" {
-  bucket = "${local.app_name}-contents-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}"
+  bucket = "${local.app_name}-contents"
 }
 
 resource "aws_s3_bucket_website_configuration" "cdn_content_bucket" {

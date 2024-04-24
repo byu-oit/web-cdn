@@ -165,11 +165,11 @@ infrastructure:
     dev:
       settings:
         root-dns: cdn-dev.byu.edu
-        account-stack-name: web-community-cdn-account
-        certificate-arn: arn:aws:acm:us-east-1:632558792265:certificate/1bc2f81c-2f79-46b3-9d3b-54ce672ba8be
+        account-stack-name: byu-oit-cdn-dev
+        certificate-arn: arn:aws:acm:us-east-1:637423550675:certificate/c1f3cc33-ea1f-4525-9b4c-cfb195a07f7f
     prd:
       settings:
         root-dns: cdn.byu.edu
-        account-stack-name: web-community-cdn-account
+        account-stack-name: byu-oit-cdn-prd
         certificate-arn: arn:aws:acm:us-east-1:204581410681:certificate/18c1b547-de51-43d3-afa5-2bd05493c41c
 
