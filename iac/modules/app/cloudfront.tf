@@ -72,7 +72,7 @@ resource "aws_iam_policy" "allow_cdn_parameter_store_access" {
 
 resource "aws_cloudfront_distribution" "website_cloudfront" {
   comment      = "${var.cdn_url} - ${var.name} ${var.env}"
-  aliases      = [var.cdn_url]
+  aliases      = ["*.${var.cdn_url}"]
   enabled      = true
   http_version = "http2"
 
