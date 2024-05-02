@@ -16,8 +16,8 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "aws-sdk": "^2.89.0",
-    "axios": "^0.18.0",
+    "aws-sdk": "^2.1611.0",
+    "axios": "^0.28.0",
     "chai-fs": "^1.0.0",
     "chalk": "^2.4.1",
     "child-process-promise": "^2.2.1",
@@ -42,7 +42,7 @@
     "p-queue": "^2.3.1",
     "request": "^2.81.0",
     "request-promise-native": "^1.0.4",
-    "semver": "^5.4.1",
+    "semver": "^5.7.2",
     "type-detect": "^4.0.3",
     "winston": "^2.3.1",
     "yargs": "^8.0.2"
