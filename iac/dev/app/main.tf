@@ -1,4 +1,4 @@
-terraform {
+terraform { // test comment
   required_version = "1.4.5"
   backend "s3" {
     bucket         = "terraform-state-storage-637423550675"
