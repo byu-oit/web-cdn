@@ -1,5 +1,5 @@
 terraform {
-  required_version = "1.4.5"
+  required_version = "1.8.2"
   backend "s3" {
     bucket         = "terraform-state-storage-891377162314"
     dynamodb_table = "terraform-state-lock-891377162314"
@@ -9,7 +9,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.63"
+      version = "~> 5.27"
     }
     local = {
       source  = "hashicorp/local"
