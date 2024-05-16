@@ -165,8 +165,8 @@ infrastructure:
     dev:
       settings:
         root-dns: cdn-dev.byu.edu
-        account-stack-name: byu-oit-cdn-dev
-        certificate-arn: arn:aws:acm:us-east-1:637423550675:certificate/c1f3cc33-ea1f-4525-9b4c-cfb195a07f7f
+        account-stack-name: web-community-cdn-account
+        certificate-arn: arn:aws:acm:us-east-1:632558792265:certificate/1bc2f81c-2f79-46b3-9d3b-54ce672ba8be
     prd:
       settings:
         root-dns: cdn.byu.edu
