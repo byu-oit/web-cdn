@@ -10,7 +10,7 @@
     "test": "mocha --recursive"
   },
   "engines": {
-    "node": ">=14.0.0",
+    "node": ">=20.0.0",
     "npm": ">=6.0.0"
   },
   "author": "",
@@ -52,7 +52,6 @@
   },
   "devDependencies": {
     "array-equal": "^1.0.0",
-    "babel-preset-es2016-node4": "^6.0.1",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
     "mocha": "^10.2.0",

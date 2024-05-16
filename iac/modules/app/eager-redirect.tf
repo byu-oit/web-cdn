@@ -30,7 +30,7 @@ resource "aws_lambda_function" "eager_redirect_func" {
   function_name    = "${local.app_name}-edge-eager-redirect"
   filename         = data.archive_file.eager_redirect_func.output_path
   handler          = "index.handler"
-  runtime          = "nodejs16.x"
+  runtime          = "nodejs20.x"
   memory_size      = 512
   timeout          = 20
   role             = aws_iam_role.edge_lambda_execution_role.arn

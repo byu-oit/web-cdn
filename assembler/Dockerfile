@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/node:18-alpine
+FROM public.ecr.aws/docker/library/node:20-alpine
 
 ## Install python (for AWS CLI) and git
 RUN apk --no-cache add python3 git

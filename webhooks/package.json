@@ -6,7 +6,7 @@
   "author": "",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=6.11.0"
+    "node": ">=20.0.0"
   },
   "dependencies": {
     "@aws-sdk/client-ecs": "^3.554.0",
