@@ -8,7 +8,7 @@ on:
       - README.md
 concurrency: ${{ github.ref }}
 env:
-  tf_version: "1.4.5" # must match value in terraform-iac/*/app/main.tf
+  tf_version: "1.8.2" # must match value in terraform-iac/*/app/main.tf
   node_version: "20.x" # must match value in log-analyzer/sorter-lambda/package.json
 
 jobs:
