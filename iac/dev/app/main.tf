@@ -1,4 +1,4 @@
-terraform { // test comment
+terraform {
   required_version = "1.4.5"
   backend "s3" {
     bucket         = "terraform-state-storage-637423550675"
@@ -9,7 +9,7 @@ terraform { // test comment
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.63"
+      version = "~> 5.27"
     }
     local = {
       source  = "hashicorp/local"
