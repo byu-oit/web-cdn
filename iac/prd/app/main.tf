@@ -47,14 +47,14 @@ module "app" {
   env                 = local.env
   name                = local.name
   image_tag           = var.image_tag
-  s3_bucket_name      = "${local.cdn_name}-${local.env}-contents"
   index_document_name = "index.html"
   error_document_name = "error.html"
-  site_url            = "https://${local.cdn_name}.byu-oit-fullstack-trn.amazon.byu.edu"
   default_ttl         = 30
   max_ttl             = 60
   min_ttl             = 0
   force_destroy       = true
   config_branch       = local.config_branch
   stage_name          = local.stage_name
+  cdn_url             = "cdn-new.byu.edu"
 }
+

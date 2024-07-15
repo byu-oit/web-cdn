@@ -93,7 +93,7 @@ resource "aws_iam_policy" "allow_cloudfront_invalidation" {
           "cloudfront:GetInvalidation",
           "cloudfront:ListInvalidations"
         ],
-        "Resource" : "*"
+        "Resource" : aws_cloudfront_distribution.website_cloudfront.arn
       }
     ]
   })

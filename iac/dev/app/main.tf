@@ -55,5 +55,6 @@ module "app" {
   force_destroy       = true
   config_branch       = local.config_branch
   stage_name          = local.stage_name
-  cdn_url             = "byu-oit-cdn-dev.amazon.byu.edu"
+  cdn_url             = "cdn-dev.byu.edu"
 }
+
