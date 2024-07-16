@@ -75,7 +75,7 @@ resource "aws_api_gateway_rest_api" "webhook_domain" {
 
 # TODO: change when we deploy to the real domain
 resource "aws_api_gateway_domain_name" "webhook_domain" {
-  certificate_arn = module.acs.certificate_virginia.arn
+  certificate_arn = aws_acm_certificate.cert.arn
   domain_name     = "webhooks.${var.cdn_url}"
   security_policy = "TLS_1_0"
 }

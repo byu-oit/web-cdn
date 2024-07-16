@@ -29,7 +29,7 @@ resource "aws_route53_record" "cert_validation" {
 
 # ==================== Route53 ====================
 resource "aws_route53_record" "a_record" {
-  name            = "${local.app_name}-${var.env}"
+  name            = var.cdn_url
   type            = "A"
   zone_id         = data.aws_route53_zone.cdn_zone.id
   allow_overwrite = false
@@ -41,7 +41,7 @@ resource "aws_route53_record" "a_record" {
 }
 
 resource "aws_route53_record" "aaaa_record" {
-  name            = "${local.app_name}-${var.env}"
+  name            = var.cdn_url
   type            = "AAAA"
   zone_id         = data.aws_route53_zone.cdn_zone.id
   allow_overwrite = false
@@ -72,12 +72,12 @@ resource "aws_iam_policy" "allow_cdn_parameter_store_access" {
 
 resource "aws_cloudfront_distribution" "website_cloudfront" {
   comment      = "${var.cdn_url} - ${var.name} ${var.env}"
-  aliases      = ["${local.app_name}.${var.cdn_url}"]
+  aliases      = ["*.${var.cdn_url}"]
   enabled      = true
   http_version = "http2"
 
   viewer_certificate {
-    acm_certificate_arn      = module.acs.certificate_virginia.arn # aws_acm_certificate.new_cert.arn
+    acm_certificate_arn      = aws_acm_certificate.cert.arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1"
   }

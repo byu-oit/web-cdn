@@ -57,4 +57,3 @@ module "app" {
   stage_name          = local.stage_name
   cdn_url             = "cdn-dev.byu.edu"
 }
-
